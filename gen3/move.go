@@ -4,64 +4,140 @@ import (
 	"github.com/anaminus/pkm"
 )
 
+var (
+	structMoveName = makeStruct(
+		13, // 0 Name
+	)
+	structMoveData = makeStruct(
+		1, // 0 Effect
+		1, // 1 BasePower
+		1, // 2 Type
+		1, // 3 Accuracy
+		1, // 4 PP
+		1, // 5 EffectAccuracy
+		1, // 6 Affectee
+		1, // 7 Priority
+		1, // 8 Flags
+		3, // 9 Padding
+	)
+)
+
 type Move struct {
 	v Version
 	i int
 }
 
 func (m Move) Name() string {
-	// TODO
-	return ""
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveName,
+		m.i,
+		structMoveName,
+	)
+	return decodeTextString(b)
 }
 
 func (m Move) Index() int {
-	// TODO
-	return 0
+	return m.i
 }
 
 func (m Move) Description() string {
-	// TODO
-	return ""
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveDescPtr,
+		m.i-1,
+		structPtr,
+	)
+	m.v.ROM.Seek(int64(decPtr(b)), 0)
+	return readTextString(m.v.ROM)
 }
 
 func (m Move) Type() pkm.Type {
-	// TODO
-	return pkm.Type(0)
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		2,
+	)
+	return pkm.Type(b[0])
 }
 
 func (m Move) BasePower() byte {
-	// TODO
-	return 0
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		1,
+	)
+	return b[0]
 }
 
 func (m Move) Accuracy() byte {
-	// TODO
-	return 0
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		3,
+	)
+	return b[0]
 }
 
 func (m Move) Effect() pkm.Effect {
-	// TODO
-	return pkm.Effect(0)
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		0,
+	)
+	return pkm.Effect(b[0])
 }
 
 func (m Move) EffectAccuracy() byte {
-	// TODO
-	return 0
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		5,
+	)
+	return b[0]
 }
 
 func (m Move) Affectee() pkm.Affectee {
-	// TODO
-	return pkm.Affectee(0)
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		6,
+	)
+	return pkm.Affectee(b[0])
 }
 
 func (m Move) Priority() int8 {
-	// TODO
-	return 0
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		7,
+	)
+	return int8(b[0])
 }
 
 func (m Move) Flags() pkm.MoveFlags {
-	// TODO
-	return pkm.MoveFlags(0)
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		8,
+	)
+	return pkm.MoveFlags(b[0])
 }
 
 type TM struct {
