@@ -104,6 +104,13 @@ func (s stct) FieldOffset(f int) int {
 }
 
 func readStruct(r io.ReadSeeker, addr uint32, index int, s stct, fields ...int) []byte {
+	if len(fields) == 0 {
+		fields := make([]int, len(s))
+		for i := range fields {
+			fields[i] = i
+		}
+	}
+
 	off, _ := r.Seek(int64(addr)+int64(index*s.Size()), 0)
 
 	n := 0
