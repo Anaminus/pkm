@@ -197,11 +197,14 @@ type Species interface {
 	SafariRate() byte
 	// The pokemon's color.
 	Color() Color
-	// A list indicating which moves can be learned at which levels.
+	// A list of moves that can be learned, at which levels, by a pokemon of
+	// this species.
 	LearnedMoves() []LevelMove
 	// Returns whether a pokemon of this species can learn a move from a given
 	// TM.
-	CanTeachTM(tm TM) bool
+	CanLearnTM(tm TM) bool
+	// Returns a list of the TMs that a pokemon of this species can learn.
+	LearnableTMs() []TM
 }
 
 // Stats is the base stats of a species.
@@ -372,7 +375,7 @@ func (c Color) String() string {
 
 // LevelMove pairs a move with a level at which the move can be learned.
 type LevelMove struct {
-	Level int
+	Level byte
 	Move  Move
 }
 
