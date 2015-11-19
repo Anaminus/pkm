@@ -12,16 +12,26 @@ type Ability struct {
 }
 
 func (a Ability) Name() string {
-	// TODO
-	return ""
+	b := readStruct(
+		a.v.ROM,
+		a.v.AddrAbilityName,
+		a.i,
+		structAbilityName,
+	)
+	return decodeTextString(b)
 }
 
 func (a Ability) Index() int {
-	// TODO
 	return a.i
 }
 
 func (a Ability) Description() string {
-	// TODO
-	return ""
+	b := readStruct(
+		a.v.ROM,
+		a.v.AddrAbilityDescPtr,
+		a.i,
+		structPtr,
+	)
+	a.v.ROM.Seek(int64(decPtr(b)), 0)
+	return readTextString(a.v.ROM)
 }
