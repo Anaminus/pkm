@@ -1,17 +1,7 @@
-package emerald
+package gen3
 
 import (
 	"github.com/anaminus/pkm"
-)
-
-const (
-	addrSpeciesName  = 0x003185C8
-	addrSpeciesData  = 0x003203CC
-	addrPokedexData  = 0x0056B5B0
-	addrLevelMove    = 0x003230DC
-	addrLevelMovePtr = 0x0032937C
-	addrSpeciesTM    = 0x0031E898
-	addrEvoTable     = 0x0032531C
 )
 
 var (
@@ -68,7 +58,7 @@ type Species struct {
 func (s Species) Name() string {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesName,
+		s.v.AddrSpeciesName,
 		s.i,
 		structSpeciesName,
 	)
@@ -82,7 +72,7 @@ func (s Species) Index() int {
 func (s Species) Description() string {
 	b := readStruct(
 		s.v.ROM,
-		addrPokedexData,
+		s.v.AddrPokedexData,
 		s.i,
 		structDexData,
 		3,
@@ -94,7 +84,7 @@ func (s Species) Description() string {
 func (s Species) Category() string {
 	b := readStruct(
 		s.v.ROM,
-		addrPokedexData,
+		s.v.AddrPokedexData,
 		s.i,
 		structDexData,
 		0,
@@ -105,7 +95,7 @@ func (s Species) Category() string {
 func (s Species) Height() pkm.Height {
 	b := readStruct(
 		s.v.ROM,
-		addrPokedexData,
+		s.v.AddrPokedexData,
 		s.i,
 		structDexData,
 		1,
@@ -116,7 +106,7 @@ func (s Species) Height() pkm.Height {
 func (s Species) Weight() pkm.Weight {
 	b := readStruct(
 		s.v.ROM,
-		addrPokedexData,
+		s.v.AddrPokedexData,
 		s.i,
 		structDexData,
 		1,
@@ -127,7 +117,7 @@ func (s Species) Weight() pkm.Weight {
 func (s Species) BaseStats() pkm.Stats {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		0, 1, 2, 3, 4, 5,
@@ -145,7 +135,7 @@ func (s Species) BaseStats() pkm.Stats {
 func (s Species) Type() [2]pkm.Type {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		6, 7,
@@ -159,7 +149,7 @@ func (s Species) Type() [2]pkm.Type {
 func (s Species) CatchRate() byte {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		8,
@@ -170,7 +160,7 @@ func (s Species) CatchRate() byte {
 func (s Species) ExpYield() byte {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		9,
@@ -181,7 +171,7 @@ func (s Species) ExpYield() byte {
 func (s Species) EffortPoints() pkm.EffortPoints {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		10,
@@ -192,7 +182,7 @@ func (s Species) EffortPoints() pkm.EffortPoints {
 func (s Species) HeldItem() [2]pkm.Item {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		0,
@@ -206,7 +196,7 @@ func (s Species) HeldItem() [2]pkm.Item {
 func (s Species) GenderRatio() pkm.GenderRatio {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		13,
@@ -217,7 +207,7 @@ func (s Species) GenderRatio() pkm.GenderRatio {
 func (s Species) EggCycles() byte {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		14,
@@ -228,7 +218,7 @@ func (s Species) EggCycles() byte {
 func (s Species) BaseFriendship() byte {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		15,
@@ -239,7 +229,7 @@ func (s Species) BaseFriendship() byte {
 func (s Species) LevelType() pkm.LevelType {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		16,
@@ -250,7 +240,7 @@ func (s Species) LevelType() pkm.LevelType {
 func (s Species) EggGroup() [2]pkm.EggGroup {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		17, 18,
@@ -264,7 +254,7 @@ func (s Species) EggGroup() [2]pkm.EggGroup {
 func (s Species) Ability() [2]pkm.Ability {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		19, 20,
@@ -278,7 +268,7 @@ func (s Species) Ability() [2]pkm.Ability {
 func (s Species) SafariRate() byte {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		21,
@@ -289,7 +279,7 @@ func (s Species) SafariRate() byte {
 func (s Species) Color() pkm.Color {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		22,
@@ -300,7 +290,7 @@ func (s Species) Color() pkm.Color {
 func (s Species) Flipped() bool {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesData,
+		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
 		22,
@@ -309,7 +299,7 @@ func (s Species) Flipped() bool {
 }
 
 func (s Species) LearnedMoves() []pkm.LevelMove {
-	s.v.ROM.Seek(addrLevelMovePtr+int64(s.i*4), 0)
+	s.v.ROM.Seek(int64(s.v.AddrLevelMovePtr)+int64(s.i*4), 0)
 	p := readPtr(s.v.ROM)
 	s.v.ROM.Seek(int64(p), 0)
 	q := make([]byte, 256)
@@ -329,7 +319,7 @@ func (s Species) LearnedMoves() []pkm.LevelMove {
 
 func (s Species) CanLearnTM(tm pkm.TM) bool {
 	b := make([]byte, 1)
-	s.v.ROM.Seek(addrSpeciesTM+int64(s.i*8+tm.Index()/8), 0)
+	s.v.ROM.Seek(int64(s.v.AddrSpeciesTM)+int64(s.i*8+tm.Index()/8), 0)
 	s.v.ROM.Read(b)
 	return b[0]&(1<<uint(tm.Index()%8)) != 0
 }
@@ -337,7 +327,7 @@ func (s Species) CanLearnTM(tm pkm.TM) bool {
 func (s Species) LearnableTMs() []pkm.TM {
 	b := readStruct(
 		s.v.ROM,
-		addrSpeciesTM,
+		s.v.AddrSpeciesTM,
 		s.i,
 		structSpeciesTM,
 	)

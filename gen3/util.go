@@ -1,4 +1,4 @@
-package emerald
+package gen3
 
 import (
 	"encoding/binary"
@@ -7,6 +7,7 @@ import (
 )
 
 const addrROM = 0x08000000
+const addrGameCode = 0xA0
 const strTerm = 0xFF
 
 var defaultCodec = CodecUTF8

@@ -1,4 +1,4 @@
-package emerald
+package gen3
 
 import (
 	"bytes"
@@ -11,19 +11,35 @@ import (
 ////////////////////////////////////////////////////////////////
 
 type Version struct {
-	ROM io.ReadSeeker
+	ROM                io.ReadSeeker
+	name               string
+	AddrAbilityName    uint32 // Table of ability names.
+	AddrAbilityDescPtr uint32 // Table of pointers to ability descriptions.
+	AddrItemData       uint32 // Table of item data.
+	AddrItemDesc       uint32 // Base address of item description pointers.
+	AddrLevelMovePtr   uint32 // Table of pointers to learned-move data.
+	AddrMoveName       uint32 // Table of move names.
+	AddrMoveData       uint32 // Table of move data.
+	AddrPokedexData    uint32 // Table of pokedex data.
+	AddrPokedexNatl    uint32 // Table of national dex mappings.
+	AddrPokedexStd     uint32 // Table of standard dex mappings.
+	AddrSpeciesData    uint32 // Table of species data.
+	AddrSpeciesEvo     uint32 // Table of species evolution data.
+	AddrSpeciesName    uint32 // Table of species names.
+	AddrSpeciesTM      uint32 // Table of species TM compatibility.
+	AddrTMMove         uint32 // Table of TM move mappings.
 }
 
 var _ = pkm.Version(&Version{})
 
-func OpenROM(rom io.ReadSeeker) pkm.Version {
-	return &Version{
-		ROM: rom,
-	}
+func (v Version) Name() string {
+	return v.name
 }
 
-func (v Version) Name() string {
-	return "Emerald"
+func (v Version) GameCode() (gc pkm.GameCode) {
+	v.ROM.Seek(addrGameCode, 0)
+	v.ROM.Read(gc[:])
+	return
 }
 
 func (v Version) Query() pkm.Query {
@@ -56,7 +72,7 @@ func (v Version) SpeciesByIndex(index int) pkm.Species {
 func (v Version) SpeciesByName(name string) pkm.Species {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, speciesNameLength)
-	v.ROM.Seek(addrSpeciesName, 0)
+	v.ROM.Seek(int64(v.AddrSpeciesName), 0)
 	for i := 0; i < indexSizeSpecies; i++ {
 		v.ROM.Read(b)
 		if bytes.Equal(encName, truncateText(b)) {
@@ -99,7 +115,7 @@ func (v Version) ItemByName(name string) pkm.Item {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, itemNameLength)
 	for i := 0; i < indexSizeSpecies; i++ {
-		v.ROM.Seek(addrItemData+int64(i*itemDataLength), 0)
+		v.ROM.Seek(int64(v.AddrItemData)+int64(i*itemDataLength), 0)
 		v.ROM.Read(b)
 		if bytes.Equal(encName, truncateText(b)) {
 			return Item{v: v, i: i}
@@ -130,7 +146,7 @@ func (v Version) AbilityByIndex(index int) pkm.Ability {
 func (v Version) AbilityByName(name string) pkm.Ability {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, abilityNameLength)
-	v.ROM.Seek(addrAbilityName, 0)
+	v.ROM.Seek(int64(v.AddrAbilityName), 0)
 	for i := 0; i < indexSizeAbility; i++ {
 		v.ROM.Read(b)
 		if bytes.Equal(encName, truncateText(b)) {
@@ -162,7 +178,7 @@ func (v Version) MoveByIndex(index int) pkm.Move {
 func (v Version) MoveByName(name string) pkm.Move {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, moveNameLength)
-	v.ROM.Seek(addrMoveName, 0)
+	v.ROM.Seek(int64(v.AddrMoveName), 0)
 	for i := 0; i < indexSizeMove; i++ {
 		v.ROM.Read(b)
 		if bytes.Equal(encName, truncateText(b)) {

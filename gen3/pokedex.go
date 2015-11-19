@@ -1,12 +1,7 @@
-package emerald
+package gen3
 
 import (
 	"github.com/anaminus/pkm"
-)
-
-const (
-	addrStdDex  = 0x0031D94C
-	addrNatlDex = 0x0031DC82
 )
 
 const (

@@ -1,9 +1,4 @@
-package emerald
-
-const (
-	addrItemData = 0x005839A0
-	addrItemDesc = 0x00580000
-)
+package gen3
 
 var (
 	structItemData = makeStruct(

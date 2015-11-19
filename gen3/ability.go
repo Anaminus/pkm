@@ -1,9 +1,4 @@
-package emerald
-
-const (
-	addrAbilityName = 0x0031B6DB
-	addrAbilityDesc = 0x0031AF98
-)
+package gen3
 
 var (
 	structAbilityName = makeStruct(

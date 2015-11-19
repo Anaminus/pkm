@@ -1,4 +1,4 @@
-package emerald
+package gen3
 
 const (
 	indexSizeSpecies = 412

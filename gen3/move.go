@@ -1,13 +1,7 @@
-package emerald
+package gen3
 
 import (
 	"github.com/anaminus/pkm"
-)
-
-const (
-	addrMoveName = 0x0031977C
-	addrMoveData = 0x0031C898
-	addrTMMove   = 0x00616040
 )
 
 type Move struct {
