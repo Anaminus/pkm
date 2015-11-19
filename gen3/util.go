@@ -7,7 +7,7 @@ import (
 )
 
 const addrROM = 0x08000000
-const addrGameCode = 0xA0
+const addrGameCode = 0xAC
 const strTerm = 0xFF
 
 var defaultCodec = CodecUTF8
