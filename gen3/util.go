@@ -12,6 +12,10 @@ const strTerm = 0xFF
 
 var defaultCodec = CodecUTF8
 
+var structPtr = makeStruct(
+	4, // Pointer
+)
+
 // Decode a string from a Reader, delimited by string terminator, using
 // default encoding.
 func readTextString(r io.Reader) string {
