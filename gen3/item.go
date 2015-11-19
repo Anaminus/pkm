@@ -24,21 +24,39 @@ type Item struct {
 }
 
 func (i Item) Name() string {
-	// TODO
-	return ""
+	b := readStruct(
+		i.v.ROM,
+		i.v.AddrItemData,
+		i.i,
+		structItemData,
+		0,
+	)
+	return decodeTextString(b)
 }
 
 func (i Item) Index() int {
-	// TODO
-	return 0
+	return i.i
 }
 
 func (i Item) Description() string {
-	// TODO
-	return ""
+	b := readStruct(
+		i.v.ROM,
+		i.v.AddrItemData,
+		i.i,
+		structItemData,
+		5,
+	)
+	i.v.ROM.Seek(int64(i.v.AddrItemDesc)+int64(decUint32(b)), 0)
+	return decodeTextString(b)
 }
 
 func (i Item) Price() int {
-	// TODO
-	return 0
+	b := readStruct(
+		i.v.ROM,
+		i.v.AddrItemData,
+		i.i,
+		structItemData,
+		2,
+	)
+	return int(decUint16(b))
 }
