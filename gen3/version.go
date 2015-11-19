@@ -20,6 +20,7 @@ type Version struct {
 	AddrLevelMovePtr   uint32 // Table of pointers to learned-move data.
 	AddrMoveName       uint32 // Table of move names.
 	AddrMoveData       uint32 // Table of move data.
+	AddrMoveDescPtr    uint32 // Table of pointers to move descriptions.
 	AddrPokedexData    uint32 // Table of pokedex data.
 	AddrPokedexNatl    uint32 // Table of national dex mappings.
 	AddrPokedexStd     uint32 // Table of standard dex mappings.
