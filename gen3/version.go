@@ -84,12 +84,19 @@ func (v Version) SpeciesByName(name string) pkm.Species {
 }
 
 func (v Version) Pokedex() []pkm.Pokedex {
-	// TODO
-	return nil
+	return []pkm.Pokedex{
+		PokedexNatl{v: v},
+		PokedexStd{v: v},
+	}
 }
 
 func (v Version) PokedexByName(name string) pkm.Pokedex {
-	// TODO
+	switch strings.ToUpper(name) {
+	case strings.ToUpper(PokedexNatl{}.Name()):
+		return PokedexNatl{v: v}
+	case strings.ToUpper(PokedexStd{}.Name()):
+		return PokedexStd{v: v}
+	}
 	return nil
 }
 
