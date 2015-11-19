@@ -46,6 +46,9 @@ type Version interface {
 	// Returns a the name of the version.
 	Name() string
 
+	// Returns the game code of the version.
+	GameCode() GameCode
+
 	// Returns a Query value that can be used to used for deep searching.
 	Query() Query
 
@@ -126,6 +129,65 @@ type Version interface {
 	// Returns a map from any bank, by its name. The name is case-insensitive,
 	// and uses the default codec. Returns nil if no map was found.
 	MapByName(name string) Map
+}
+
+////////////////////////////////////////////////////////////////
+
+type GameCode [4]byte
+
+func (gc GameCode) String() string {
+	return "AGB-" + string(gc[:])
+}
+
+func (gc GameCode) Type() string {
+	switch gc[0] {
+	case 'A':
+		return "Normal:A"
+	case 'B':
+		return "Normal:B"
+	case 'C':
+		return "Normal:C"
+	case 'F':
+		return "Famicom"
+	case 'K':
+		return "Acceleration sensor"
+	case 'P':
+		return "e-Reader"
+	case 'R':
+		return "Rumble/Gyro"
+	case 'U':
+		return "RTC/Solar sensor"
+	case 'V':
+		return "Rumble"
+	default:
+		return "Unknown:" + string(gc[0])
+	}
+	return string(gc[0])
+}
+
+func (gc GameCode) ID() string {
+	return string(gc[1:3])
+}
+
+func (gc GameCode) Language() string {
+	switch gc[3] {
+	case 'J':
+		return "Japanese"
+	case 'E':
+		return "English"
+	case 'P':
+		return "Europe"
+	case 'G':
+		return "German"
+	case 'F':
+		return "French"
+	case 'I':
+		return "Italian"
+	case 'S':
+		return "Spanish"
+	default:
+		return "Unknown:" + string(gc[3])
+	}
 }
 
 ////////////////////////////////////////////////////////////////
