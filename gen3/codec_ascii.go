@@ -54,7 +54,7 @@ func (codecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error) 
 		for i := 0; i < n; i++ {
 			buf[i] = codecASCIILookup[int(buf[i])+256]
 		}
-		if _, e := dst.Write(buf); e != nil {
+		if _, e := dst.Write(buf[:n]); e != nil {
 			err = e
 			return
 		}
