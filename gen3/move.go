@@ -1,6 +1,7 @@
 package gen3
 
 import (
+	"fmt"
 	"github.com/anaminus/pkm"
 )
 
@@ -19,6 +20,9 @@ var (
 		1, // 7 Priority
 		1, // 8 Flags
 		3, // 9 Padding
+	)
+	structTMMove = makeStruct(
+		2, // 0 Move
 	)
 )
 
@@ -146,16 +150,22 @@ type TM struct {
 }
 
 func (tm TM) Name() string {
-	// TODO
-	return ""
+	if tm.i > 49 {
+		return "HM" + fmt.Sprintf("%02d", tm.i-49)
+	}
+	return "TM" + fmt.Sprintf("%02d", tm.i+1)
 }
 
 func (tm TM) Index() int {
-	// TODO
-	return 0
+	return tm.i
 }
 
 func (tm TM) Move() pkm.Move {
-	// TODO
-	return nil
+	b := readStruct(
+		tm.v.ROM,
+		tm.v.AddrTMMove,
+		tm.i,
+		structTMMove,
+	)
+	return Move{v: tm.v, i: int(decUint16(b))}
 }
