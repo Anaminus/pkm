@@ -7,39 +7,22 @@ import (
 // CodecASCII is a pkm.Codec that decodes as single bytes. It has the least
 // detail, but each character fits in one byte, and will not be interpreted as
 // invalid unicode.
-type CodecASCII [512]byte
-
-func (c CodecASCII) Name() string {
-	return "ASCII"
-}
-
+//
 // Decode decodes text data from src into bytes, which are written to dst.
 // Unrepresentable characters are replaced by "#", or a reasonable equivalent.
-func (c CodecASCII) Decode(dst io.Writer, src io.Reader) (written int, err error) {
-	buf := make([]byte, 1024)
-	for {
-		n, e := src.Read(buf)
-		if e != nil && e != io.EOF {
-			err = e
-			return
-		}
-		for i := 0; i < n; i++ {
-			buf[i] = c[int(buf[i])]
-		}
-		if _, e := dst.Write(buf); e != nil {
-			err = e
-			return
-		}
-		if e != nil { // EOF
-			return
-		}
-	}
-}
-
+//
 // Encode encodes bytes in src into text data, which are written to dst. Most
 // printable characters are converted as expected. All other characters,
 // including "#", are encoded as 0xFF.
-func (c CodecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error) {
+var CodecASCII codecASCII
+
+type codecASCII struct{}
+
+func (codecASCII) Name() string {
+	return "ASCII"
+}
+
+func (codecASCII) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := make([]byte, 1024)
 	for {
 		n, e := src.Read(buf)
@@ -48,7 +31,7 @@ func (c CodecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error
 			return
 		}
 		for i := 0; i < n; i++ {
-			buf[i] = c[int(buf[i])+256]
+			buf[i] = codecASCIILookup[int(buf[i])]
 		}
 		if _, e := dst.Write(buf); e != nil {
 			err = e
@@ -60,7 +43,28 @@ func (c CodecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error
 	}
 }
 
-var codecASCII = CodecASCII{
+func (codecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error) {
+	buf := make([]byte, 1024)
+	for {
+		n, e := src.Read(buf)
+		if e != nil && e != io.EOF {
+			err = e
+			return
+		}
+		for i := 0; i < n; i++ {
+			buf[i] = codecASCIILookup[int(buf[i])+256]
+		}
+		if _, e := dst.Write(buf); e != nil {
+			err = e
+			return
+		}
+		if e != nil { // EOF
+			return
+		}
+	}
+}
+
+var codecASCIILookup = [512]byte{
 	// Decode
 	0x00: ' ',
 	0x01: 'A',

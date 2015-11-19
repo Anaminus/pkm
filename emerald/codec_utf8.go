@@ -8,19 +8,24 @@ import (
 // CodecUTF8 is a pkm.Codec that decodes into UTF-8. It has good detail, but
 // some characters cannot be represented. However, all characters are unique.
 // This is the default codec used by structures that return text data.
-type CodecUTF8 struct {
-	MapDecode [256]rune
-	MapEncode map[rune]byte
-}
-
-func (c CodecUTF8) Name() string {
-	return "UTF-8"
-}
-
+//
 // Decode decodes text data from src into a UTF-8 string, which is written to
 // dst. Unrepresentable characters are replaced with the corresponding rune in
 // CodecPUA. Unsupported characters are ignored.
-func (c CodecUTF8) Decode(dst io.Writer, src io.Reader) (written int, err error) {
+//
+// Encode encodes a UTF-8 string in src into text data, which are written to
+// dst.
+//
+// CodecUTF8 is the default codec used by Versions.
+var CodecUTF8 codecUTF8
+
+type codecUTF8 struct{}
+
+func (codecUTF8) Name() string {
+	return "UTF-8"
+}
+
+func (codecUTF8) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 	bufin := make([]byte, 1024)
 	bufout := make([]rune, 1024)
 	for {
@@ -30,7 +35,7 @@ func (c CodecUTF8) Decode(dst io.Writer, src io.Reader) (written int, err error)
 			return
 		}
 		for i := 0; i < n; i++ {
-			bufout[i] = c.MapDecode[bufin[i]]
+			bufout[i] = codecUTF8Decode[bufin[i]]
 		}
 		if _, e := dst.Write([]byte(string(bufout))); e != nil {
 			err = e
@@ -42,9 +47,7 @@ func (c CodecUTF8) Decode(dst io.Writer, src io.Reader) (written int, err error)
 	}
 }
 
-// Encode encodes a UTF-8 string in src into text data, which are written to
-// dst.
-func (c CodecUTF8) Encode(dst io.Writer, src io.Reader) (written int, err error) {
+func (codecUTF8) Encode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := bufio.NewReader(src)
 	bufout := make([]byte, 1)
 	for {
@@ -53,7 +56,7 @@ func (c CodecUTF8) Encode(dst io.Writer, src io.Reader) (written int, err error)
 			err = e
 			return
 		}
-		if b, ok := c.MapEncode[r]; ok {
+		if b, ok := codecUTF8Encode[r]; ok {
 			bufout[0] = b
 			if _, e := dst.Write(bufout); e != nil {
 				err = e
@@ -66,8 +69,8 @@ func (c CodecUTF8) Encode(dst io.Writer, src io.Reader) (written int, err error)
 	}
 }
 
-var codecUTF8 = CodecUTF8{
-	MapDecode: [256]rune{
+var (
+	codecUTF8Decode = [256]rune{
 		0x00: ' ',
 		0x01: 'À',
 		0x02: 'Á',
@@ -324,8 +327,8 @@ var codecUTF8 = CodecUTF8{
 		0xFD: 0xF0FD,
 		0xFE: 0xF0FE,
 		0xFF: 0xF0FF,
-	},
-	MapEncode: map[rune]byte{
+	}
+	codecUTF8Encode = map[rune]byte{
 		' ':    0x00,
 		'À':    0x01,
 		'Á':    0x02,
@@ -582,5 +585,5 @@ var codecUTF8 = CodecUTF8{
 		0xF0FD: 0xFD,
 		0xF0FE: 0xFE,
 		0xF0FF: 0xFF,
-	},
-}
+	}
+)

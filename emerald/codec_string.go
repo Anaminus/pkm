@@ -9,19 +9,22 @@ import (
 // CodecString is a pkm.Codec that decodes into UTF-8. Single text bytes can
 // be decoded into multiple UTF-8 characters. It has the best detail, but
 // decoded characters cannot be re-encoded 1-to-1.
-type CodecString struct {
-	MapDecode [256]string
-	MapEncode map[rune]byte
-}
-
-func (c CodecString) Name() string {
-	return "String"
-}
-
+//
 // Decode decodes text data from src into a UTF-8 string, which is written to
 // dst. Unrepresentable characters are replaced with the corresponding rune in
 // CodecPUA.
-func (c CodecString) Decode(dst io.Writer, src io.Reader) (written int, err error) {
+//
+// Encode encodes a UTF-8 string in src into text data, which are written to
+// dst. Unsupported characters are ignored.
+var CodecString codecString
+
+type codecString struct{}
+
+func (codecString) Name() string {
+	return "String"
+}
+
+func (codecString) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 	bufin := make([]byte, 1024)
 	bufout := make([]string, 1024)
 	for {
@@ -31,7 +34,7 @@ func (c CodecString) Decode(dst io.Writer, src io.Reader) (written int, err erro
 			return
 		}
 		for i := 0; i < n; i++ {
-			bufout[i] = c.MapDecode[bufin[i]]
+			bufout[i] = codecStringDecode[bufin[i]]
 		}
 		if _, e := dst.Write([]byte(strings.Join(bufout, ""))); e != nil {
 			err = e
@@ -43,9 +46,7 @@ func (c CodecString) Decode(dst io.Writer, src io.Reader) (written int, err erro
 	}
 }
 
-// Encode encodes a UTF-8 string in src into text data, which are written to
-// dst. Unsupported characters are ignored.
-func (c CodecString) Encode(dst io.Writer, src io.Reader) (written int, err error) {
+func (codecString) Encode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := bufio.NewReader(src)
 	bufout := make([]byte, 1)
 	for {
@@ -54,7 +55,7 @@ func (c CodecString) Encode(dst io.Writer, src io.Reader) (written int, err erro
 			err = e
 			return
 		}
-		if b, ok := c.MapEncode[r]; ok {
+		if b, ok := codecStringEncode[r]; ok {
 			bufout[0] = b
 			if _, e := dst.Write(bufout); e != nil {
 				err = e
@@ -67,8 +68,8 @@ func (c CodecString) Encode(dst io.Writer, src io.Reader) (written int, err erro
 	}
 }
 
-var codecString = CodecString{
-	MapDecode: [256]string{
+var (
+	codecStringDecode = [256]string{
 		0x00: " ",
 		0x01: "À",
 		0x02: "Á",
@@ -325,8 +326,8 @@ var codecString = CodecString{
 		0xFD: "\uF0FD",
 		0xFE: "\uF0FE",
 		0xFF: "\uF0FF",
-	},
-	MapEncode: map[rune]byte{
+	}
+	codecStringEncode = map[rune]byte{
 		' ': 0x00,
 		'À': 0x01,
 		'Á': 0x02,
@@ -583,5 +584,5 @@ var codecString = CodecString{
 		'\uF0FD': 0xFD,
 		'\uF0FE': 0xFE,
 		'\uF0FF': 0xFF,
-	},
-}
+	}
+)

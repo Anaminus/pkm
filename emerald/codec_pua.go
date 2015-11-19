@@ -7,15 +7,21 @@ import (
 
 // CodecPUA is a pkm.Codec that decodes into UTF-8. Characters are located in
 // the Private Use Area in the range F000-F0FF.
-type CodecPUA struct{}
+//
+// Decode decodes text data from src into a UTF-8 string, which is written to
+// dst.
+//
+// Encode encodes a UTF-8 string in src into text data, which are written to
+// dst. Characters outside the range F000-F0FF are ignored.
+var CodecPUA codecPUA
 
-func (c CodecPUA) Name() string {
+type codecPUA struct{}
+
+func (codecPUA) Name() string {
 	return "UTF-8 PUA"
 }
 
-// Decode decodes text data from src into a UTF-8 string, which is written to
-// dst.
-func (c CodecPUA) Decode(dst io.Writer, src io.Reader) (written int, err error) {
+func (codecPUA) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 	bufin := make([]byte, 1024)
 	bufout := make([]rune, 1024)
 	for {
@@ -37,9 +43,7 @@ func (c CodecPUA) Decode(dst io.Writer, src io.Reader) (written int, err error) 
 	}
 }
 
-// Encode encodes a UTF-8 string in src into text data, which are written to
-// dst. Characters outside the range F000-F0FF are ignored.
-func (c CodecPUA) Encode(dst io.Writer, src io.Reader) (written int, err error) {
+func (codecPUA) Encode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := bufio.NewReader(src)
 	bufout := make([]byte, 1)
 	for {
@@ -60,5 +64,3 @@ func (c CodecPUA) Encode(dst io.Writer, src io.Reader) (written int, err error) 
 		}
 	}
 }
-
-var codecPUA CodecPUA

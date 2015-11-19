@@ -9,7 +9,7 @@ import (
 const addrROM = 0x08000000
 const strTerm = 0xFF
 
-var defaultCodec = codecUTF8
+var defaultCodec = CodecUTF8
 
 // Decode a string from a Reader, delimited by string terminator, using
 // default encoding.

@@ -32,10 +32,10 @@ func (v Version) Query() pkm.Query {
 
 func (v Version) Codecs() []pkm.Codec {
 	return []pkm.Codec{
-		codecUTF8,
-		codecASCII,
-		codecString,
-		codecPUA,
+		CodecUTF8,
+		CodecASCII,
+		CodecString,
+		CodecPUA,
 	}
 }
 func (v Version) DefaultCodec() pkm.Codec {
