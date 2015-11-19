@@ -324,7 +324,10 @@ func (s Species) LearnedMoves() []pkm.LevelMove {
 	return lms
 }
 
-func (s Species) CanTeachTM(tm pkm.TM) bool {
-	// TODO
-	return false
+func (s Species) CanLearnTM(tm pkm.TM) bool {
+	b := make([]byte, 1)
+	s.v.ROM.Seek(addrSpeciesTM+int64(s.i*8+tm.Index()/8), 0)
+	s.v.ROM.Read(b)
+	return b[0]&(1<<uint(tm.Index()%8)) != 0
+}
 }
