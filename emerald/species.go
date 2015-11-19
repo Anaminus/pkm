@@ -68,7 +68,6 @@ func (s Species) Name() string {
 		addrSpeciesName,
 		s.i,
 		structSpeciesName,
-		0,
 	)
 	return decodeTextString(b)
 }
