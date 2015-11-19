@@ -217,11 +217,12 @@ type Species interface {
 	Name() string
 	// The index of the species.
 	Index() int
-
+	// The pokedex category of the species.
 	Category() string
+	// The height of the species.
 	Height() Height
+	// The weight of the species.
 	Weight() Weight
-
 	// The pokedex description of the species.
 	Description() string
 	// The base stats of the species.
@@ -441,8 +442,33 @@ type LevelMove struct {
 	Move  Move
 }
 
-type Height byte
-type Weight byte
+type Height uint16
+
+func (h Height) Centimeters() float32 {
+	return h.Meters() / 100
+}
+
+func (h Height) Meters() float32 {
+	return float32(h) * 10
+}
+
+func (h Height) Feet() float32 {
+	return h.Meters() * 0.3048
+}
+
+func (h Height) Inches() float32 {
+	return h.Feet() / 12
+}
+
+type Weight uint16
+
+func (w Weight) Kilograms() float32 {
+	return float32(w) * 10
+}
+
+func (w Weight) Pounds() float32 {
+	return w.Kilograms() * 0.45359237
+}
 
 ////////////////////////////////////////////////////////////////
 
