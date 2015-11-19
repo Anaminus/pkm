@@ -69,6 +69,12 @@ func decPtr(b []byte) uint32 {
 	return p - addrROM
 }
 
+func readPtr(r io.Reader) uint32 {
+	b := make([]byte, 4)
+	r.Read(b)
+	return decPtr(b)
+}
+
 ////////////////////////////////////////////////////////////////
 
 type stct []int
