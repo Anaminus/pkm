@@ -55,6 +55,9 @@ var (
 		2,  // 7 TrainerScale
 		2,  // 8 TrainerOffset
 	)
+	structSpeciesTM = makeStruct(
+		8, // 0 TMs
+	)
 )
 
 type Species struct {
@@ -330,4 +333,19 @@ func (s Species) CanLearnTM(tm pkm.TM) bool {
 	s.v.ROM.Read(b)
 	return b[0]&(1<<uint(tm.Index()%8)) != 0
 }
+
+func (s Species) LearnableTMs() []pkm.TM {
+	b := readStruct(
+		s.v.ROM,
+		addrSpeciesTM,
+		s.i,
+		structSpeciesTM,
+	)
+	tms := make([]pkm.TM, 0, indexSizeTM)
+	for i := 0; i < indexSizeTM; i++ {
+		if b[i/8]&(1<<uint(i%8)) != 0 {
+			tms = append(tms, TM{v: s.v, i: s.i})
+		}
+	}
+	return tms
 }
