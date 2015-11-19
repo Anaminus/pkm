@@ -306,8 +306,22 @@ func (s Species) Flipped() bool {
 }
 
 func (s Species) LearnedMoves() []pkm.LevelMove {
-	// TODO
-	return nil
+	s.v.ROM.Seek(addrLevelMovePtr+int64(s.i*4), 0)
+	p := readPtr(s.v.ROM)
+	s.v.ROM.Seek(int64(p), 0)
+	q := make([]byte, 256)
+	lms := make([]pkm.LevelMove, 0, 8)
+	for j := 0; j < len(q); j += 2 {
+		l := q[j+1]
+		if q[j] == 0xFF || l == 0xFF {
+			break
+		}
+		lms = append(lms, pkm.LevelMove{
+			Level: l / 2,
+			Move:  Move{v: s.v, i: int(q[j]) | int(l%2)<<8},
+		})
+	}
+	return lms
 }
 
 func (s Species) CanTeachTM(tm pkm.TM) bool {
