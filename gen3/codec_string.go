@@ -324,7 +324,7 @@ var (
 		0xFB: "\uF0FB",
 		0xFC: "\uF0FC",
 		0xFD: "\uF0FD",
-		0xFE: "\uF0FE",
+		0xFE: "\n",
 		0xFF: "\uF0FF",
 	}
 	codecStringEncode = map[rune]byte{
@@ -582,7 +582,7 @@ var (
 		'\uF0FB': 0xFB,
 		'\uF0FC': 0xFC,
 		'\uF0FD': 0xFD,
-		'\uF0FE': 0xFE,
+		'\n':     0xFE,
 		'\uF0FF': 0xFF,
 	}
 )
