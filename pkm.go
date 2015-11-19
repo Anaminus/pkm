@@ -268,6 +268,8 @@ type Species interface {
 	CanLearnTM(tm TM) bool
 	// Returns a list of the TMs that a pokemon of this species can learn.
 	LearnableTMs() []TM
+	// A list of species this species can evolve into, and by which methods.
+	Evolutions() []Evolution
 }
 
 // Stats is the base stats of a species.
@@ -551,6 +553,21 @@ type TM interface {
 	Name() string
 	Index() int
 	Move() Move
+}
+
+////////////////////////////////////////////////////////////////
+
+// Evolution describes how a species evolves and what it evolves into.
+type Evolution interface {
+	// The species evolved into.
+	Target() Species
+	// The condition in which the evolution occurs.
+	Method() uint16
+	// A parameter applied to the evolution method.
+	Param() uint16
+	// Returns a string that combines the method and parameter to describe the
+	// condition for evolution.
+	MethodString() string
 }
 
 ////////////////////////////////////////////////////////////////

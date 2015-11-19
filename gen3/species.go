@@ -1,6 +1,7 @@
 package gen3
 
 import (
+	"fmt"
 	"github.com/anaminus/pkm"
 )
 
@@ -47,6 +48,11 @@ var (
 	)
 	structSpeciesTM = makeStruct(
 		8, // 0 TMs
+	)
+	structEvolution = makeStruct(
+		2, // 0 Method
+		2, // 1 Parameter
+		2, // 2 Target
 	)
 )
 
@@ -338,4 +344,113 @@ func (s Species) LearnableTMs() []pkm.TM {
 		}
 	}
 	return tms
+}
+
+func (s Species) Evolutions() []pkm.Evolution {
+	const evoIndexSize = 5
+
+	evos := make([]pkm.Evolution, 0, evoIndexSize)
+	for i := 0; i < evoIndexSize; i++ {
+		b := readStruct(
+			s.v.ROM,
+			s.v.AddrSpeciesEvo+uint32(i*structEvolution.Size()),
+			s.i,
+			structEvolution,
+			0,
+		)
+		if decUint16(b) == 0 {
+			continue
+		}
+		evos = append(evos, Evolution{
+			v: s.v,
+			s: s.i,
+			i: i,
+		})
+	}
+	return evos
+}
+
+type Evolution struct {
+	v Version
+	s int
+	i int
+}
+
+func (e Evolution) Target() pkm.Species {
+	b := readStruct(
+		e.v.ROM,
+		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.s,
+		structEvolution,
+		2,
+	)
+	return Species{v: e.v, i: int(decUint16(b))}
+}
+
+func (e Evolution) Method() uint16 {
+	b := readStruct(
+		e.v.ROM,
+		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.s,
+		structEvolution,
+		0,
+	)
+	return decUint16(b)
+}
+
+func (e Evolution) Param() uint16 {
+	b := readStruct(
+		e.v.ROM,
+		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.s,
+		structEvolution,
+		1,
+	)
+	return decUint16(b)
+}
+
+func (e Evolution) MethodString() string {
+	b := readStruct(
+		e.v.ROM,
+		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.s,
+		structEvolution,
+		0, 1,
+	)
+	method := decUint16(b[0:2])
+	param := decUint16(b[2:4])
+
+	switch method {
+	case 0x1:
+		return fmt.Sprintf("Friendship")
+	case 0x2:
+		return fmt.Sprintf("Friendship (Day)")
+	case 0x3:
+		return fmt.Sprintf("Friendship (Night)")
+	case 0x4:
+		return fmt.Sprintf("Level %d", param)
+	case 0x5:
+		return fmt.Sprintf("Trade")
+	case 0x6:
+		return fmt.Sprintf("Trade holding %s", (Item{v: e.v, i: int(param)}).Name())
+	case 0x7:
+		return fmt.Sprintf("Use %s", (Item{v: e.v, i: int(param)}).Name())
+	case 0x8:
+		return fmt.Sprintf("Level %d if ATK > DEF", param)
+	case 0x9:
+		return fmt.Sprintf("Level %d if ATK = DEF", param)
+	case 0xA:
+		return fmt.Sprintf("Level %d if ATK < DEF", param)
+	case 0xB:
+		return fmt.Sprintf("Personality[1] (%d)", param)
+	case 0xC:
+		return fmt.Sprintf("Personality[2] (%d)", param)
+	case 0xD:
+		return fmt.Sprintf("Level %d (Spawns extra)", param)
+	case 0xE:
+		return fmt.Sprintf("Level %d (Spawned)", param)
+	case 0xF:
+		return fmt.Sprintf("Beauty (%d)", param)
+	}
+	return "None"
 }
