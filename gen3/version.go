@@ -72,7 +72,7 @@ func (v Version) SpeciesByIndex(index int) pkm.Species {
 
 func (v Version) SpeciesByName(name string) pkm.Species {
 	encName := encodeText(strings.ToUpper(name))
-	b := make([]byte, speciesNameLength)
+	b := make([]byte, structSpeciesName.Size())
 	v.ROM.Seek(int64(v.AddrSpeciesName), 0)
 	for i := 0; i < indexSizeSpecies; i++ {
 		v.ROM.Read(b)
@@ -121,10 +121,14 @@ func (v Version) ItemByIndex(index int) pkm.Item {
 
 func (v Version) ItemByName(name string) pkm.Item {
 	encName := encodeText(strings.ToUpper(name))
-	b := make([]byte, itemNameLength)
 	for i := 0; i < indexSizeSpecies; i++ {
-		v.ROM.Seek(int64(v.AddrItemData)+int64(i*itemDataLength), 0)
-		v.ROM.Read(b)
+		b := readStruct(
+			v.ROM,
+			v.AddrItemData,
+			i,
+			structItemData,
+			0,
+		)
 		if bytes.Equal(encName, truncateText(b)) {
 			return Item{v: v, i: i}
 		}
@@ -153,7 +157,7 @@ func (v Version) AbilityByIndex(index int) pkm.Ability {
 
 func (v Version) AbilityByName(name string) pkm.Ability {
 	encName := encodeText(strings.ToUpper(name))
-	b := make([]byte, abilityNameLength)
+	b := make([]byte, structAbilityName.Size())
 	v.ROM.Seek(int64(v.AddrAbilityName), 0)
 	for i := 0; i < indexSizeAbility; i++ {
 		v.ROM.Read(b)
@@ -185,7 +189,7 @@ func (v Version) MoveByIndex(index int) pkm.Move {
 
 func (v Version) MoveByName(name string) pkm.Move {
 	encName := encodeText(strings.ToUpper(name))
-	b := make([]byte, moveNameLength)
+	b := make([]byte, structMoveName.Size())
 	v.ROM.Seek(int64(v.AddrMoveName), 0)
 	for i := 0; i < indexSizeMove; i++ {
 		v.ROM.Read(b)

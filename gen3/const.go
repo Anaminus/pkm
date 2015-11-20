@@ -17,11 +17,3 @@ var mapIndexSize = [indexSizeBank]int{
 	107, 60, 88, 1, 0, 12, 0, 0,
 	2, 0,
 }
-
-const (
-	speciesNameLength = 11
-	itemNameLength    = 14
-	itemDataLength    = 44
-	abilityNameLength = 13
-	moveNameLength    = 13
-)
