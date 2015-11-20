@@ -91,11 +91,11 @@ func (v Version) Pokedex() []pkm.Pokedex {
 }
 
 func (v Version) PokedexByName(name string) pkm.Pokedex {
-	switch strings.ToUpper(name) {
-	case strings.ToUpper(PokedexNatl{}.Name()):
-		return PokedexNatl{v: v}
-	case strings.ToUpper(PokedexStd{}.Name()):
-		return PokedexStd{v: v}
+	name = strings.ToUpper(name)
+	for _, dex := range v.Pokedex() {
+		if strings.ToUpper(dex.Name()) == name {
+			return dex
+		}
 	}
 	return nil
 }
