@@ -93,7 +93,7 @@ func makeStruct(fields ...int) stct {
 }
 
 func (s stct) Len() int {
-	return len(s)
+	return len(s) - 1
 }
 
 func (s stct) Size() int {
@@ -110,7 +110,7 @@ func (s stct) FieldOffset(f int) int {
 
 func readStruct(r io.ReadSeeker, addr uint32, index int, s stct, fields ...int) []byte {
 	if len(fields) == 0 {
-		fields := make([]int, len(s))
+		fields = make([]int, s.Len())
 		for i := range fields {
 			fields[i] = i
 		}
