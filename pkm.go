@@ -26,19 +26,22 @@ type Codec interface {
 // DecodeText decodes a slice of text data into a string.
 func DecodeText(codec Codec, b []byte) (s string, err error) {
 	var buf bytes.Buffer
-	if _, err := codec.Decode(&buf, bytes.NewReader(b)); err != nil {
+	if n, err := codec.Decode(&buf, bytes.NewReader(b)); err != nil {
 		return "", err
+	} else {
+		return string(buf.Bytes()[:n]), nil
 	}
-	return buf.String(), nil
+
 }
 
 // EncodeText encodes a string into a slice of text data.
 func EncodeText(codec Codec, s string) (b []byte, err error) {
 	var buf bytes.Buffer
-	if _, err := codec.Encode(&buf, strings.NewReader(s)); err != nil {
+	if n, err := codec.Encode(&buf, strings.NewReader(s)); err != nil {
 		return nil, err
+	} else {
+		return buf.Bytes()[:n], nil
 	}
-	return buf.Bytes(), nil
 }
 
 // Version represents a single version of a pokemon game.
