@@ -34,12 +34,16 @@ func (codecUTF8) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 			err = e
 			return
 		}
-		for i := 0; i < n; i++ {
-			bufout[i] = codecUTF8Decode[bufin[i]]
-		}
-		if _, e := dst.Write([]byte(string(bufout))); e != nil {
-			err = e
-			return
+		if n > 0 {
+			for i := 0; i < n; i++ {
+				bufout[i] = codecUTF8Decode[bufin[i]]
+			}
+			n, e := dst.Write([]byte(string(bufout[:n])))
+			written += n
+			if e != nil {
+				err = e
+				return
+			}
 		}
 		if e != nil { // EOF
 			return
@@ -51,16 +55,20 @@ func (codecUTF8) Encode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := bufio.NewReader(src)
 	bufout := make([]byte, 1)
 	for {
-		r, _, e := buf.ReadRune()
+		r, n, e := buf.ReadRune()
 		if e != nil && e != io.EOF {
 			err = e
 			return
 		}
-		if b, ok := codecUTF8Encode[r]; ok {
-			bufout[0] = b
-			if _, e := dst.Write(bufout); e != nil {
-				err = e
-				return
+		if n > 0 {
+			if b, ok := codecUTF8Encode[r]; ok {
+				bufout[0] = b
+				n, e := dst.Write(bufout)
+				written += n
+				if e != nil {
+					err = e
+					return
+				}
 			}
 		}
 		if e != nil { // EOF

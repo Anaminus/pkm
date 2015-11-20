@@ -30,12 +30,16 @@ func (codecASCII) Decode(dst io.Writer, src io.Reader) (written int, err error) 
 			err = e
 			return
 		}
-		for i := 0; i < n; i++ {
-			buf[i] = codecASCIILookup[int(buf[i])]
-		}
-		if _, e := dst.Write(buf[:n]); e != nil {
-			err = e
-			return
+		if n > 0 {
+			for i := 0; i < n; i++ {
+				buf[i] = codecASCIILookup[int(buf[i])]
+			}
+			n, e := dst.Write(buf[:n])
+			written += n
+			if e != nil {
+				err = e
+				return
+			}
 		}
 		if e != nil { // EOF
 			return
@@ -51,12 +55,16 @@ func (codecASCII) Encode(dst io.Writer, src io.Reader) (written int, err error) 
 			err = e
 			return
 		}
-		for i := 0; i < n; i++ {
-			buf[i] = codecASCIILookup[int(buf[i])+256]
-		}
-		if _, e := dst.Write(buf[:n]); e != nil {
-			err = e
-			return
+		if n > 0 {
+			for i := 0; i < n; i++ {
+				buf[i] = codecASCIILookup[int(buf[i])+256]
+			}
+			n, e := dst.Write(buf[:n])
+			written += n
+			if e != nil {
+				err = e
+				return
+			}
 		}
 		if e != nil { // EOF
 			return

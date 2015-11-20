@@ -30,12 +30,16 @@ func (codecPUA) Decode(dst io.Writer, src io.Reader) (written int, err error) {
 			err = e
 			return
 		}
-		for i := 0; i < n; i++ {
-			bufout[i] = rune(bufin[i]) + 0xF000
-		}
-		if _, e := dst.Write([]byte(string(bufout))); e != nil {
-			err = e
-			return
+		if n > 0 {
+			for i := 0; i < n; i++ {
+				bufout[i] = rune(bufin[i]) + 0xF000
+			}
+			n, e := dst.Write([]byte(string(bufout[:n])))
+			written += n
+			if e != nil {
+				err = e
+				return
+			}
 		}
 		if e != nil { // EOF
 			return
@@ -47,14 +51,16 @@ func (codecPUA) Encode(dst io.Writer, src io.Reader) (written int, err error) {
 	buf := bufio.NewReader(src)
 	bufout := make([]byte, 1)
 	for {
-		r, _, e := buf.ReadRune()
+		r, n, e := buf.ReadRune()
 		if e != nil && e != io.EOF {
 			err = e
 			return
 		}
-		if 0xF000 <= r && r <= 0xF0FF {
+		if n > 0 && 0xF000 <= r && r <= 0xF0FF {
 			bufout[0] = byte(r - 0xF000)
-			if _, e := dst.Write(bufout); e != nil {
+			n, e := dst.Write(bufout)
+			written += n
+			if e != nil {
 				err = e
 				return
 			}
