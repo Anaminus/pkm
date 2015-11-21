@@ -542,12 +542,21 @@ func (a Affectee) String() string {
 // MoveFlags indicate various properties of a move.
 type MoveFlags byte
 
-func (f MoveFlags) Contact() bool    { return f&1 != 0 }
-func (f MoveFlags) Protect() bool    { return f&2 != 0 }
-func (f MoveFlags) MagicCoat() bool  { return f&4 != 0 }
-func (f MoveFlags) Snatch() bool     { return f&8 != 0 }
-func (f MoveFlags) MirrorMove() bool { return f&16 != 0 }
-func (f MoveFlags) KingsRock() bool  { return f&32 != 0 }
+const (
+	Contact MoveFlags = 1 << iota
+	Protect
+	MagicCoat
+	Snatch
+	MirrorMove
+	KingsRock
+)
+
+func (f MoveFlags) Contact() bool    { return f&Contact != 0 }
+func (f MoveFlags) Protect() bool    { return f&Protect != 0 }
+func (f MoveFlags) MagicCoat() bool  { return f&MagicCoat != 0 }
+func (f MoveFlags) Snatch() bool     { return f&Snatch != 0 }
+func (f MoveFlags) MirrorMove() bool { return f&MirrorMove != 0 }
+func (f MoveFlags) KingsRock() bool  { return f&KingsRock != 0 }
 
 ////////////////////////////////////////////////////////////////
 
