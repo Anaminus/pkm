@@ -1,8 +1,8 @@
 package gen3
 
 import (
-	"fmt"
 	"github.com/anaminus/pkm"
+	"strconv"
 )
 
 var (
@@ -150,10 +150,20 @@ type TM struct {
 }
 
 func (tm TM) Name() string {
+	var name string
+	var num int
 	if tm.i > 49 {
-		return "HM" + fmt.Sprintf("%02d", tm.i-49)
+		name = "HM0"
+		num = tm.i - 49
+	} else {
+		name = "TM0"
+		num = tm.i + 1
 	}
-	return "TM" + fmt.Sprintf("%02d", tm.i+1)
+	if numstr := strconv.Itoa(num); len(numstr) == 1 {
+		return name + numstr
+	} else {
+		return name[:2] + numstr
+	}
 }
 
 func (tm TM) Index() int {
