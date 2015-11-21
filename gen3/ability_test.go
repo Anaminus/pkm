@@ -16,9 +16,9 @@ func TestAbility(t *testing.T) {
 		t.Errorf("Index: unexpected index %d", v)
 	}
 	if v := ability.Name(); v != "STENCH" {
-		t.Errorf("Name: unexpected name %s", v)
+		t.Errorf("Name: unexpected name \"%s\"", v)
 	}
 	if v := ability.Description(); v != "Helps repel wild POKéMON." {
-		t.Errorf("Description: unexpected description %s", v)
+		t.Errorf("Description: unexpected description \"%s\"", v)
 	}
 }
