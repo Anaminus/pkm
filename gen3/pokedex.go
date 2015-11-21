@@ -34,13 +34,15 @@ func (p Pokedex) Species(number int) pkm.Species {
 		panic("species number out of bounds")
 	}
 	p.v.ROM.Seek(int64(p.v.pokedex[p.i].Address), 0)
+	var species pkm.Species
 	for i, q := 1, make([]byte, 2); i <= indexSizeSpecies; i++ {
 		p.v.ROM.Read(q)
 		if int(decUint16(q)) == number {
-			return Species{v: p.v, i: i}
+			species = Species{v: p.v, i: i}
+			break
 		}
 	}
-	return nil
+	return species
 }
 
 func (p Pokedex) AllSpecies() []pkm.Species {
