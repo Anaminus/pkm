@@ -46,8 +46,8 @@ func (i Item) Description() string {
 		structItemData,
 		5,
 	)
-	i.v.ROM.Seek(int64(i.v.AddrItemDesc)+int64(decUint32(b)), 0)
-	return decodeTextString(b)
+	i.v.ROM.Seek(int64(decPtr(b)), 0)
+	return readTextString(i.v.ROM)
 }
 
 func (i Item) Price() int {
