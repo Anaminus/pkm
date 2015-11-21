@@ -13,12 +13,12 @@ func TestAbility(t *testing.T) {
 
 	ability := ver.AbilityByIndex(1)
 	if v := ability.Index(); v != 1 {
-		t.Errorf("Index: unexpected index %d", v)
+		t.Errorf("Index: unexpected result %d", v)
 	}
 	if v := ability.Name(); v != "STENCH" {
-		t.Errorf("Name: unexpected name \"%s\"", v)
+		t.Errorf("Name: unexpected result \"%s\"", v)
 	}
 	if v := ability.Description(); v != "Helps repel wild POKéMON." {
-		t.Errorf("Description: unexpected description \"%s\"", v)
+		t.Errorf("Description: unexpected result \"%s\"", v)
 	}
 }
