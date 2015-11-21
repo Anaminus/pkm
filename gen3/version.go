@@ -13,6 +13,7 @@ import (
 type Version struct {
 	ROM                io.ReadSeeker
 	name               string
+	pokedex            []pokedexData
 	AddrAbilityName    uint32 // Table of ability names.
 	AddrAbilityDescPtr uint32 // Table of pointers to ability descriptions.
 	AddrItemData       uint32 // Table of item data.
@@ -21,8 +22,6 @@ type Version struct {
 	AddrMoveData       uint32 // Table of move data.
 	AddrMoveDescPtr    uint32 // Table of pointers to move descriptions.
 	AddrPokedexData    uint32 // Table of pokedex data.
-	AddrPokedexNatl    uint32 // Table of national dex mappings.
-	AddrPokedexStd     uint32 // Table of standard dex mappings.
 	AddrSpeciesData    uint32 // Table of species data.
 	AddrSpeciesEvo     uint32 // Table of species evolution data.
 	AddrSpeciesName    uint32 // Table of species names.
@@ -83,10 +82,11 @@ func (v *Version) SpeciesByName(name string) pkm.Species {
 }
 
 func (v *Version) Pokedex() []pkm.Pokedex {
-	return []pkm.Pokedex{
-		PokedexNatl{v: v},
-		PokedexStd{v: v},
+	a := make([]pkm.Pokedex, len(v.pokedex))
+	for i := range v.pokedex {
+		a[i] = Pokedex{v: v, i: i}
 	}
+	return a
 }
 
 func (v *Version) PokedexByName(name string) pkm.Pokedex {

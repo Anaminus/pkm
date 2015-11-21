@@ -31,7 +31,11 @@ var (
 
 var versionLookup = map[pkm.GameCode]Version{
 	CodeRubyEN: Version{
-		name:               "Pokémon Ruby Version",
+		name: "Pokémon Ruby Version",
+		pokedex: []pokedexData{
+			{Name: "National", Size: 386, Address: 0xFFFFFF},
+			{Name: "Standard", Size: 202, Address: 0xFFFFFF},
+		},
 		AddrAbilityName:    0xFFFFFF,
 		AddrAbilityDescPtr: 0xFFFFFF,
 		AddrItemData:       0xFFFFFF,
@@ -40,8 +44,6 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrMoveData:       0xFFFFFF,
 		AddrMoveDescPtr:    0xFFFFFF,
 		AddrPokedexData:    0xFFFFFF,
-		AddrPokedexNatl:    0xFFFFFF,
-		AddrPokedexStd:     0xFFFFFF,
 		AddrSpeciesData:    0xFFFFFF,
 		AddrSpeciesEvo:     0xFFFFFF,
 		AddrSpeciesName:    0xFFFFFF,
@@ -49,7 +51,11 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrTMMove:         0xFFFFFF,
 	},
 	CodeSapphireEN: Version{
-		name:               "Pokémon Sapphire Version",
+		name: "Pokémon Sapphire Version",
+		pokedex: []pokedexData{
+			{Name: "National", Size: 386, Address: 0xFFFFFF},
+			{Name: "Standard", Size: 202, Address: 0xFFFFFF},
+		},
 		AddrAbilityName:    0xFFFFFF,
 		AddrAbilityDescPtr: 0xFFFFFF,
 		AddrItemData:       0xFFFFFF,
@@ -58,8 +64,6 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrMoveData:       0xFFFFFF,
 		AddrMoveDescPtr:    0xFFFFFF,
 		AddrPokedexData:    0xFFFFFF,
-		AddrPokedexNatl:    0xFFFFFF,
-		AddrPokedexStd:     0xFFFFFF,
 		AddrSpeciesData:    0xFFFFFF,
 		AddrSpeciesEvo:     0xFFFFFF,
 		AddrSpeciesName:    0xFFFFFF,
@@ -67,7 +71,11 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrTMMove:         0xFFFFFF,
 	},
 	CodeEmeraldEN: Version{
-		name:               "Pokémon Emerald Version",
+		name: "Pokémon Emerald Version",
+		pokedex: []pokedexData{
+			{Name: "National", Size: 386, Address: 0x31DC82},
+			{Name: "Standard", Size: 202, Address: 0x31D94C},
+		},
 		AddrAbilityName:    0x31B6DB,
 		AddrAbilityDescPtr: 0x31BAD4,
 		AddrItemData:       0x5839A0,
@@ -76,8 +84,6 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrMoveData:       0x31C898,
 		AddrMoveDescPtr:    0x61C524,
 		AddrPokedexData:    0x56B5B0,
-		AddrPokedexNatl:    0x31DC82,
-		AddrPokedexStd:     0x31D94C,
 		AddrSpeciesData:    0x3203CC,
 		AddrSpeciesEvo:     0x32531C,
 		AddrSpeciesName:    0x3185C8,
@@ -85,7 +91,11 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrTMMove:         0x616040,
 	},
 	CodeFireRedEN: Version{
-		name:               "Pokémon Fire Red Version",
+		name: "Pokémon Fire Red Version",
+		pokedex: []pokedexData{
+			{Name: "National", Size: 386, Address: 0xFFFFFF},
+			{Name: "Standard", Size: 151, Address: 0xFFFFFF},
+		},
 		AddrAbilityName:    0xFFFFFF,
 		AddrAbilityDescPtr: 0xFFFFFF,
 		AddrItemData:       0xFFFFFF,
@@ -94,8 +104,6 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrMoveData:       0xFFFFFF,
 		AddrMoveDescPtr:    0xFFFFFF,
 		AddrPokedexData:    0xFFFFFF,
-		AddrPokedexNatl:    0xFFFFFF,
-		AddrPokedexStd:     0xFFFFFF,
 		AddrSpeciesData:    0xFFFFFF,
 		AddrSpeciesEvo:     0xFFFFFF,
 		AddrSpeciesName:    0xFFFFFF,
@@ -103,7 +111,11 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrTMMove:         0xFFFFFF,
 	},
 	CodeLeafGreenEN: Version{
-		name:               "Pokémon Leaf Green Version",
+		name: "Pokémon Leaf Green Version",
+		pokedex: []pokedexData{
+			{Name: "National", Size: 386, Address: 0xFFFFFF},
+			{Name: "Standard", Size: 151, Address: 0xFFFFFF},
+		},
 		AddrAbilityName:    0xFFFFFF,
 		AddrAbilityDescPtr: 0xFFFFFF,
 		AddrItemData:       0xFFFFFF,
@@ -112,8 +124,6 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrMoveData:       0xFFFFFF,
 		AddrMoveDescPtr:    0xFFFFFF,
 		AddrPokedexData:    0xFFFFFF,
-		AddrPokedexNatl:    0xFFFFFF,
-		AddrPokedexStd:     0xFFFFFF,
 		AddrSpeciesData:    0xFFFFFF,
 		AddrSpeciesEvo:     0xFFFFFF,
 		AddrSpeciesName:    0xFFFFFF,
