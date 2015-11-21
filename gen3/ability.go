@@ -7,7 +7,7 @@ var (
 )
 
 type Ability struct {
-	v Version
+	v *Version
 	i int
 }
 

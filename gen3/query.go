@@ -5,7 +5,7 @@ import (
 )
 
 type Query struct {
-	v Version
+	v *Version
 }
 
 func (q Query) SpeciesByName(name string) pkm.Species {

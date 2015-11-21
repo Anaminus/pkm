@@ -19,7 +19,7 @@ var (
 )
 
 type Item struct {
-	v Version
+	v *Version
 	i int
 }
 

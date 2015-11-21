@@ -32,21 +32,21 @@ type Version struct {
 
 var _ = pkm.Version(&Version{})
 
-func (v Version) Name() string {
+func (v *Version) Name() string {
 	return v.name
 }
 
-func (v Version) GameCode() (gc pkm.GameCode) {
+func (v *Version) GameCode() (gc pkm.GameCode) {
 	v.ROM.Seek(addrGameCode, 0)
 	v.ROM.Read(gc[:])
 	return
 }
 
-func (v Version) Query() pkm.Query {
+func (v *Version) Query() pkm.Query {
 	return &Query{v: v}
 }
 
-func (v Version) Codecs() []pkm.Codec {
+func (v *Version) Codecs() []pkm.Codec {
 	return []pkm.Codec{
 		CodecUTF8,
 		CodecASCII,
@@ -54,22 +54,22 @@ func (v Version) Codecs() []pkm.Codec {
 		CodecPUA,
 	}
 }
-func (v Version) DefaultCodec() pkm.Codec {
+func (v *Version) DefaultCodec() pkm.Codec {
 	return defaultCodec
 }
 
-func (v Version) SpeciesIndexSize() int {
+func (v *Version) SpeciesIndexSize() int {
 	return indexSizeSpecies
 }
 
-func (v Version) SpeciesByIndex(index int) pkm.Species {
+func (v *Version) SpeciesByIndex(index int) pkm.Species {
 	if index < 0 || index >= indexSizeSpecies {
 		panic("species index out of bounds")
 	}
 	return Species{v: v, i: index}
 }
 
-func (v Version) SpeciesByName(name string) pkm.Species {
+func (v *Version) SpeciesByName(name string) pkm.Species {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, structSpeciesName.Size())
 	v.ROM.Seek(int64(v.AddrSpeciesName), 0)
@@ -82,14 +82,14 @@ func (v Version) SpeciesByName(name string) pkm.Species {
 	return nil
 }
 
-func (v Version) Pokedex() []pkm.Pokedex {
+func (v *Version) Pokedex() []pkm.Pokedex {
 	return []pkm.Pokedex{
 		PokedexNatl{v: v},
 		PokedexStd{v: v},
 	}
 }
 
-func (v Version) PokedexByName(name string) pkm.Pokedex {
+func (v *Version) PokedexByName(name string) pkm.Pokedex {
 	name = strings.ToUpper(name)
 	for _, dex := range v.Pokedex() {
 		if strings.ToUpper(dex.Name()) == name {
@@ -99,11 +99,11 @@ func (v Version) PokedexByName(name string) pkm.Pokedex {
 	return nil
 }
 
-func (v Version) ItemIndexSize() int {
+func (v *Version) ItemIndexSize() int {
 	return indexSizeItem
 }
 
-func (v Version) Items() []pkm.Item {
+func (v *Version) Items() []pkm.Item {
 	a := make([]pkm.Item, indexSizeItem)
 	for i := range a {
 		a[i] = Item{v: v, i: i}
@@ -111,14 +111,14 @@ func (v Version) Items() []pkm.Item {
 	return a
 }
 
-func (v Version) ItemByIndex(index int) pkm.Item {
+func (v *Version) ItemByIndex(index int) pkm.Item {
 	if index < 0 || index >= indexSizeItem {
 		panic("item index out of bounds")
 	}
 	return Item{v: v, i: index}
 }
 
-func (v Version) ItemByName(name string) pkm.Item {
+func (v *Version) ItemByName(name string) pkm.Item {
 	encName := encodeText(strings.ToUpper(name))
 	for i := 0; i < indexSizeSpecies; i++ {
 		b := readStruct(
@@ -135,11 +135,11 @@ func (v Version) ItemByName(name string) pkm.Item {
 	return nil
 }
 
-func (v Version) AbilityIndexSize() int {
+func (v *Version) AbilityIndexSize() int {
 	return indexSizeAbility
 }
 
-func (v Version) Abilities() []pkm.Ability {
+func (v *Version) Abilities() []pkm.Ability {
 	a := make([]pkm.Ability, indexSizeAbility)
 	for i := range a {
 		a[i] = Ability{v: v, i: i}
@@ -147,14 +147,14 @@ func (v Version) Abilities() []pkm.Ability {
 	return a
 }
 
-func (v Version) AbilityByIndex(index int) pkm.Ability {
+func (v *Version) AbilityByIndex(index int) pkm.Ability {
 	if index < 0 || index >= indexSizeAbility {
 		panic("ability index out of bounds")
 	}
 	return Ability{v: v, i: index}
 }
 
-func (v Version) AbilityByName(name string) pkm.Ability {
+func (v *Version) AbilityByName(name string) pkm.Ability {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, structAbilityName.Size())
 	v.ROM.Seek(int64(v.AddrAbilityName), 0)
@@ -167,11 +167,11 @@ func (v Version) AbilityByName(name string) pkm.Ability {
 	return nil
 }
 
-func (v Version) MoveIndexSize() int {
+func (v *Version) MoveIndexSize() int {
 	return indexSizeMove
 }
 
-func (v Version) Moves() []pkm.Move {
+func (v *Version) Moves() []pkm.Move {
 	a := make([]pkm.Move, indexSizeMove)
 	for i := range a {
 		a[i] = Move{v: v, i: i}
@@ -179,14 +179,14 @@ func (v Version) Moves() []pkm.Move {
 	return a
 }
 
-func (v Version) MoveByIndex(index int) pkm.Move {
+func (v *Version) MoveByIndex(index int) pkm.Move {
 	if index < 0 || index >= indexSizeMove {
 		panic("move index out of bounds")
 	}
 	return Move{v: v, i: index}
 }
 
-func (v Version) MoveByName(name string) pkm.Move {
+func (v *Version) MoveByName(name string) pkm.Move {
 	encName := encodeText(strings.ToUpper(name))
 	b := make([]byte, structMoveName.Size())
 	v.ROM.Seek(int64(v.AddrMoveName), 0)
@@ -199,11 +199,11 @@ func (v Version) MoveByName(name string) pkm.Move {
 	return nil
 }
 
-func (v Version) TMIndexSize() int {
+func (v *Version) TMIndexSize() int {
 	return indexSizeTM
 }
 
-func (v Version) TMs() []pkm.TM {
+func (v *Version) TMs() []pkm.TM {
 	a := make([]pkm.TM, indexSizeTM)
 	for i := range a {
 		a[i] = TM{v: v, i: i}
@@ -211,14 +211,14 @@ func (v Version) TMs() []pkm.TM {
 	return a
 }
 
-func (v Version) TMByIndex(index int) pkm.TM {
+func (v *Version) TMByIndex(index int) pkm.TM {
 	if index < 0 || index >= indexSizeTM {
 		panic("TM index out of bounds")
 	}
 	return TM{v: v, i: index}
 }
 
-func (v Version) TMByName(name string) pkm.TM {
+func (v *Version) TMByName(name string) pkm.TM {
 	name = strings.ToUpper(name)
 	if len(name) != 4 ||
 		name[1] != 'M' ||
@@ -242,11 +242,11 @@ func (v Version) TMByName(name string) pkm.TM {
 	return TM{v: v, i: int(n) + off}
 }
 
-func (v Version) BankIndexSize() int {
+func (v *Version) BankIndexSize() int {
 	return indexSizeBank
 }
 
-func (v Version) Banks() []pkm.Bank {
+func (v *Version) Banks() []pkm.Bank {
 	a := make([]pkm.Bank, indexSizeBank)
 	for i := range a {
 		a[i] = Bank{v: v, i: i}
@@ -254,19 +254,19 @@ func (v Version) Banks() []pkm.Bank {
 	return a
 }
 
-func (v Version) BankByIndex(index int) pkm.Bank {
+func (v *Version) BankByIndex(index int) pkm.Bank {
 	if index < 0 || index >= indexSizeBank {
 		panic("bank index out of bounds")
 	}
 	return Bank{v: v, i: index}
 }
 
-func (v Version) AllMaps() []pkm.Map {
+func (v *Version) AllMaps() []pkm.Map {
 	// TODO
 	return nil
 }
 
-func (v Version) MapByName(name string) pkm.Map {
+func (v *Version) MapByName(name string) pkm.Map {
 	// TODO
 	return nil
 }

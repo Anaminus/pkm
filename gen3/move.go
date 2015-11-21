@@ -27,7 +27,7 @@ var (
 )
 
 type Move struct {
-	v Version
+	v *Version
 	i int
 }
 
@@ -145,7 +145,7 @@ func (m Move) Flags() pkm.MoveFlags {
 }
 
 type TM struct {
-	v Version
+	v *Version
 	i int
 }
 

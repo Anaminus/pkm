@@ -11,7 +11,7 @@ const (
 )
 
 type Bank struct {
-	v Version
+	v *Version
 	i int
 }
 
@@ -41,7 +41,7 @@ func (b Bank) MapByName(name string) pkm.Map {
 }
 
 type Map struct {
-	v Version
+	v *Version
 	i int
 }
 

@@ -57,7 +57,7 @@ var (
 )
 
 type Species struct {
-	v Version
+	v *Version
 	i int
 }
 
@@ -371,7 +371,7 @@ func (s Species) Evolutions() []pkm.Evolution {
 }
 
 type Evolution struct {
-	v Version
+	v *Version
 	s int
 	i int
 }
