@@ -16,7 +16,6 @@ type Version struct {
 	AddrAbilityName    uint32 // Table of ability names.
 	AddrAbilityDescPtr uint32 // Table of pointers to ability descriptions.
 	AddrItemData       uint32 // Table of item data.
-	AddrItemDesc       uint32 // Base address of item description pointers.
 	AddrLevelMovePtr   uint32 // Table of pointers to learned-move data.
 	AddrMoveName       uint32 // Table of move names.
 	AddrMoveData       uint32 // Table of move data.
