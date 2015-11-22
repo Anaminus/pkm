@@ -16,24 +16,33 @@ func ROM(t *testing.T) io.ReadSeeker {
 	if rom != nil {
 		return rom
 	}
-	t.Logf("Note: tests require `%s` file in the current directory, whose contents are a ROM dump of Pokemon Emerald (BPEE)", ROMLocation)
+	failed := false
+	defer func() {
+		if failed {
+			t.Logf("Note: tests require `%s` file in the current directory, whose contents are a ROM dump of Pokemon Emerald (BPEE)", ROMLocation)
+		}
+	}()
 	f, err := os.Open(ROMLocation)
 	if err != nil {
-		t.Fatal("failed to open ROM: %s", err)
+		failed = true
+		t.Fatalf("failed to open ROM: %s", err)
 	}
 	defer f.Close()
 	s, err := f.Seek(0, 2)
 	if err != nil {
-		t.Fatal("failed to seek ROM: %s", err)
+		failed = true
+		t.Fatalf("failed to seek ROM: %s", err)
 	}
 	b := make([]byte, s)
 	_, err = f.Seek(0, 0)
 	if err != nil {
-		t.Fatal("failed to seek ROM: %s", err)
+		failed = true
+		t.Fatalf("failed to seek ROM: %s", err)
 	}
 	_, err = f.Read(b)
 	if err != nil {
-		t.Fatal("failed to read ROM: %s", err)
+		failed = true
+		t.Fatalf("failed to read ROM: %s", err)
 	}
 	return bytes.NewReader(b)
 }
