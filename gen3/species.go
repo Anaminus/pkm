@@ -340,7 +340,7 @@ func (s Species) LearnableTMs() []pkm.TM {
 	tms := make([]pkm.TM, 0, indexSizeTM)
 	for i := 0; i < indexSizeTM; i++ {
 		if b[i/8]&(1<<uint(i%8)) != 0 {
-			tms = append(tms, TM{v: s.v, i: s.i})
+			tms = append(tms, TM{v: s.v, i: i})
 		}
 	}
 	return tms
