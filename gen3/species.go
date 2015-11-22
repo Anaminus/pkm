@@ -191,7 +191,7 @@ func (s Species) HeldItem() [2]pkm.Item {
 		s.v.AddrSpeciesData,
 		s.i,
 		structSpeciesData,
-		0,
+		11, 12,
 	)
 	return [2]pkm.Item{
 		Item{v: s.v, i: int(decUint16(b[0:2]))},
