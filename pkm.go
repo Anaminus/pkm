@@ -289,12 +289,12 @@ type Stats struct {
 // defeated.
 type EffortPoints uint16
 
-func (ev EffortPoints) HP() byte        { return byte(ev & 3 >> 0) }
-func (ev EffortPoints) Attack() byte    { return byte(ev & 12 >> 2) }
-func (ev EffortPoints) Defense() byte   { return byte(ev & 48 >> 4) }
-func (ev EffortPoints) Speed() byte     { return byte(ev & 192 >> 6) }
-func (ev EffortPoints) SpAttack() byte  { return byte(ev & 768 >> 8) }
-func (ev EffortPoints) SpDefense() byte { return byte(ev & 3072 >> 10) }
+func (ep EffortPoints) Hitpoints() byte { return byte(ep & 3 >> 0) }
+func (ep EffortPoints) Attack() byte    { return byte(ep & 12 >> 2) }
+func (ep EffortPoints) Defense() byte   { return byte(ep & 48 >> 4) }
+func (ep EffortPoints) Speed() byte     { return byte(ep & 192 >> 6) }
+func (ep EffortPoints) SpAttack() byte  { return byte(ep & 768 >> 8) }
+func (ep EffortPoints) SpDefense() byte { return byte(ep & 3072 >> 10) }
 
 // GenderRatio indicates the chance that a wild pokemon will be of a certain
 // gender, or genderless.
