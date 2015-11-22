@@ -68,9 +68,6 @@ func decUint64(b []byte) uint64 {
 
 func decPtr(b []byte) uint32 {
 	p := binary.LittleEndian.Uint32(b)
-	if p <= addrROM {
-		return p
-	}
 	return p - addrROM
 }
 
