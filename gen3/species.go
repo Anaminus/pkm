@@ -438,7 +438,7 @@ func (e Evolution) Param() uint16 {
 	return decUint16(b)
 }
 
-func (e Evolution) MethodString() string {
+func (e Evolution) MethodString() (s string) {
 	b := readStruct(
 		e.v.ROM,
 		e.v.AddrSpeciesEvo,
@@ -450,37 +450,38 @@ func (e Evolution) MethodString() string {
 	method := decUint16(b[0:2])
 	param := decUint16(b[2:4])
 
+	s = "None"
 	switch method {
 	case 0x1:
-		return fmt.Sprintf("Friendship")
+		s = fmt.Sprintf("Friendship")
 	case 0x2:
-		return fmt.Sprintf("Friendship (Day)")
+		s = fmt.Sprintf("Friendship (Day)")
 	case 0x3:
-		return fmt.Sprintf("Friendship (Night)")
+		s = fmt.Sprintf("Friendship (Night)")
 	case 0x4:
-		return fmt.Sprintf("Level %d", param)
+		s = fmt.Sprintf("Level %d", param)
 	case 0x5:
-		return fmt.Sprintf("Trade")
+		s = fmt.Sprintf("Trade")
 	case 0x6:
-		return fmt.Sprintf("Trade holding %s", (Item{v: e.v, i: int(param)}).Name())
+		s = fmt.Sprintf("Trade holding %s", (Item{v: e.v, i: int(param)}).Name())
 	case 0x7:
-		return fmt.Sprintf("Use %s", (Item{v: e.v, i: int(param)}).Name())
+		s = fmt.Sprintf("Use %s", (Item{v: e.v, i: int(param)}).Name())
 	case 0x8:
-		return fmt.Sprintf("Level %d if ATK > DEF", param)
+		s = fmt.Sprintf("Level %d if ATK > DEF", param)
 	case 0x9:
-		return fmt.Sprintf("Level %d if ATK = DEF", param)
+		s = fmt.Sprintf("Level %d if ATK = DEF", param)
 	case 0xA:
-		return fmt.Sprintf("Level %d if ATK < DEF", param)
+		s = fmt.Sprintf("Level %d if ATK < DEF", param)
 	case 0xB:
-		return fmt.Sprintf("Personality[1] (%d)", param)
+		s = fmt.Sprintf("Personality[1] (%d)", param)
 	case 0xC:
-		return fmt.Sprintf("Personality[2] (%d)", param)
+		s = fmt.Sprintf("Personality[2] (%d)", param)
 	case 0xD:
-		return fmt.Sprintf("Level %d (Spawns extra)", param)
+		s = fmt.Sprintf("Level %d (Spawns extra)", param)
 	case 0xE:
-		return fmt.Sprintf("Level %d (Spawned)", param)
+		s = fmt.Sprintf("Level %d (Spawned)", param)
 	case 0xF:
-		return fmt.Sprintf("Beauty (%d)", param)
+		s = fmt.Sprintf("Beauty (%d)", param)
 	}
-	return "None"
+	return
 }
