@@ -328,19 +328,27 @@ func (s Species) Flipped() bool {
 }
 
 func (s Species) LearnedMoves() []pkm.LevelMove {
-	s.v.ROM.Seek(int64(s.v.AddrLevelMovePtr)+int64(s.i*4), 0)
-	p := readPtr(s.v.ROM)
-	s.v.ROM.Seek(int64(p), 0)
-	q := make([]byte, 256)
-	lms := make([]pkm.LevelMove, 0, 8)
-	for j := 0; j < len(q); j += 2 {
-		l := q[j+1]
-		if q[j] == 0xFF || l == 0xFF {
+	b := readStruct(
+		s.v.ROM,
+		s.v.AddrLevelMovePtr,
+		s.i,
+		structPtr,
+	)
+	s.v.ROM.Seek(int64(decPtr(b)), 0)
+	b = make([]byte, 0, 32)
+	q := make([]byte, 2)
+	for {
+		s.v.ROM.Read(q)
+		if q[0] == strTerm && q[1] == strTerm {
 			break
 		}
+		b = append(b, q[0], q[1])
+	}
+	lms := make([]pkm.LevelMove, 0, 8)
+	for j := 0; j < len(b); j += 2 {
 		lms = append(lms, pkm.LevelMove{
-			Level: l / 2,
-			Move:  Move{v: s.v, i: int(q[j]) | int(l%2)<<8},
+			Level: b[j+1] / 2,
+			Move:  Move{v: s.v, i: int(b[j]) | int(b[j+1]%2)<<8},
 		})
 	}
 	return lms
