@@ -50,11 +50,34 @@ var (
 		8, // 0 TMs
 	)
 	structEvolution = makeStruct(
-		2, // 0 Method
-		2, // 1 Parameter
-		2, // 2 Target
+		2, // 00 Method
+		2, // 01 Parameter
+		2, // 02 Target
+		2, // 03 Padding
+
+		2, // 04 Method
+		2, // 05 Parameter
+		2, // 06 Target
+		2, // 07 Padding
+
+		2, // 08 Method
+		2, // 09 Parameter
+		2, // 10 Target
+		2, // 11 Padding
+
+		2, // 12 Method
+		2, // 13 Parameter
+		2, // 14 Target
+		2, // 15 Padding
+
+		2, // 16 Method
+		2, // 17 Parameter
+		2, // 18 Target
+		2, // 19 Padding
 	)
 )
+
+const structEvoSubLen = 5
 
 type Species struct {
 	v *Version
@@ -347,16 +370,14 @@ func (s Species) LearnableTMs() []pkm.TM {
 }
 
 func (s Species) Evolutions() []pkm.Evolution {
-	const evoIndexSize = 5
-
-	evos := make([]pkm.Evolution, 0, evoIndexSize)
-	for i := 0; i < evoIndexSize; i++ {
+	evos := make([]pkm.Evolution, 0, structEvoSubLen)
+	for i := 0; i < cap(evos); i++ {
 		b := readStruct(
 			s.v.ROM,
-			s.v.AddrSpeciesEvo+uint32(i*structEvolution.Size()),
+			s.v.AddrSpeciesEvo,
 			s.i,
 			structEvolution,
-			0,
+			i*(structEvolution.Len()/structEvoSubLen),
 		)
 		if decUint16(b) == 0 {
 			continue
@@ -379,10 +400,10 @@ type Evolution struct {
 func (e Evolution) Target() pkm.Species {
 	b := readStruct(
 		e.v.ROM,
-		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.v.AddrSpeciesEvo,
 		e.s,
 		structEvolution,
-		2,
+		e.i*(structEvolution.Len()/structEvoSubLen)+2,
 	)
 	return Species{v: e.v, i: int(decUint16(b))}
 }
@@ -390,10 +411,10 @@ func (e Evolution) Target() pkm.Species {
 func (e Evolution) Method() uint16 {
 	b := readStruct(
 		e.v.ROM,
-		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.v.AddrSpeciesEvo,
 		e.s,
 		structEvolution,
-		0,
+		e.i*(structEvolution.Len()/structEvoSubLen)+0,
 	)
 	return decUint16(b)
 }
@@ -401,10 +422,10 @@ func (e Evolution) Method() uint16 {
 func (e Evolution) Param() uint16 {
 	b := readStruct(
 		e.v.ROM,
-		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.v.AddrSpeciesEvo,
 		e.s,
 		structEvolution,
-		1,
+		e.i*(structEvolution.Len()/structEvoSubLen)+1,
 	)
 	return decUint16(b)
 }
@@ -412,10 +433,11 @@ func (e Evolution) Param() uint16 {
 func (e Evolution) MethodString() string {
 	b := readStruct(
 		e.v.ROM,
-		e.v.AddrSpeciesEvo+uint32(e.i*structEvolution.Size()),
+		e.v.AddrSpeciesEvo,
 		e.s,
 		structEvolution,
-		0, 1,
+		e.i*(structEvolution.Len()/structEvoSubLen)+0,
+		e.i*(structEvolution.Len()/structEvoSubLen)+1,
 	)
 	method := decUint16(b[0:2])
 	param := decUint16(b[2:4])
