@@ -120,17 +120,25 @@ type Version interface {
 	// default codec. Returns nil if no TM was found.
 	TMByName(name string) TM
 
+	// Attempts to retrieve the sizes of the bank pointer table and map
+	// pointer tables by scanning the ROM. Other map-related functions must be
+	// called after this.
+	ScanBanks()
 	// Returns a size that fits all bank indices (the maximum index + 1).
+	// Panics if ScanBanks has not been called.
 	BankIndexSize() int
 	// Returns a list of banks. Array indices may not correspond to bank
-	// indices.
+	// indices. Panics if ScanBanks has not been called.
 	Banks() []Bank
 	// Returns a bank by its index. Panics if the index exceeds BankIndexSize.
+	// Panics if ScanBanks has not been called.
 	BankByIndex(index int) Bank
-	// Returns a list of all maps from every bank.
+	// Returns a list of all maps from every bank. Panics if ScanBanks has not
+	// been called.
 	AllMaps() []Map
 	// Returns a map from any bank, by its name. The name is case-insensitive,
-	// and uses the default codec. Returns nil if no map was found.
+	// and uses the default codec. Returns nil if no map was found. Panics if
+	// ScanBanks has not been called.
 	MapByName(name string) Map
 }
 
