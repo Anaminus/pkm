@@ -22,8 +22,7 @@ func readTextString(r io.Reader) string {
 	b := make([]byte, 0, 32)
 	q := make([]byte, 1)
 	for {
-		r.Read(q)
-		if q[0] == strTerm {
+		if _, err := r.Read(q); err == io.EOF || q[0] == strTerm {
 			break
 		}
 		b = append(b, q[0])
