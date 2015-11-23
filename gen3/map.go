@@ -75,22 +75,30 @@ func (b Bank) Index() int {
 }
 
 func (b Bank) MapIndexSize() int {
-	// TODO
-	return 0
+	return b.v.sizeMapTable[b.i]
 }
 
 func (b Bank) Maps() []pkm.Map {
-	// TODO
-	return nil
+	maps := make([]pkm.Map, 0, 64)
+	for i := 0; i < b.MapIndexSize(); i++ {
+		maps = append(maps, Map{v: b.v, b: b.i, i: i})
+	}
+	return maps
 }
 
 func (b Bank) MapByIndex(index int) pkm.Map {
-	// TODO
-	return nil
+	if index < 0 || index >= b.MapIndexSize() {
+		panic("bank index out of bounds")
+	}
+	return Map{v: b.v, b: b.i, i: index}
 }
 
 func (b Bank) MapByName(name string) pkm.Map {
-	// TODO
+	for _, m := range b.Maps() {
+		if name == m.Name() {
+			return m
+		}
+	}
 	return nil
 }
 
@@ -100,13 +108,11 @@ type Map struct {
 }
 
 func (m Map) BankIndex() int {
-	// TODO
-	return 0
+	return m.b
 }
 
 func (m Map) Index() int {
-	// TODO
-	return 0
+	return m.i
 }
 
 func (m Map) Encounters() {
@@ -115,6 +121,32 @@ func (m Map) Encounters() {
 }
 
 func (m Map) Name() string {
-	// TODO
-	return ""
+	m.v.ROM.Seek(int64(m.v.AddrBanksPtr), 0)
+	b := readStruct(
+		m.v.ROM,
+		readPtr(m.v.ROM),
+		m.b,
+		structPtr,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		m.i,
+		structPtr,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapHeader,
+		6,
+	)
+	b = readStruct(
+		m.v.ROM,
+		m.v.AddrMapLabel,
+		int(b[0]),
+		structMapLabel,
+	)
+	m.v.ROM.Seek(int64(decPtr(b[4:8])), 0)
+	return readTextString(m.v.ROM)
 }
