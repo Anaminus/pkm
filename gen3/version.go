@@ -14,6 +14,7 @@ type Version struct {
 	ROM                io.ReadSeeker
 	name               string
 	pokedex            []pokedexData
+	sizeMapTable       []int
 	AddrAbilityName    uint32 // Table of ability names.
 	AddrAbilityDescPtr uint32 // Table of pointers to ability descriptions.
 	AddrBanksPtr       uint32 // Pointer to bank pointer table.
@@ -243,12 +244,89 @@ func (v *Version) TMByName(name string) pkm.TM {
 	return TM{v: v, i: int(n) + off}
 }
 
+func validMapHeader(rom io.ReadSeeker, ptr uint32) bool {
+	maph := make([]byte, structMapHeader.Size())
+	rom.Seek(int64(ptr), 0)
+	rom.Read(maph)
+	if _, v := decPtrValid(maph[0:4]); !v {
+		return false
+	}
+	if _, v := decPtrValid(maph[4:8]); !v {
+		return false
+	}
+	if _, v := decPtrValid(maph[8:12]); !v {
+		return false
+	} else {
+	}
+	return true
+}
+
+func (v *Version) ScanBanks() {
+	ps := structPtr.Size()
+
+	// Find size of bank pointer table.
+	size := 256
+	banks := make([]byte, 256*ps)
+	v.ROM.Seek(int64(v.AddrBanksPtr), 0)
+	v.ROM.Seek(int64(readPtr(v.ROM)), 0)
+	v.ROM.Read(banks)
+	for i := 0; i < len(banks); i += ps {
+		bptr, valid := decPtrValid(banks[i : i+ps])
+		// Stop if pointer isn't valid.
+		if !valid {
+			size = i / ps
+			break
+		}
+		// If a bank pointer points to an address within the supposed bank
+		// pointer table, then the table must end at that location.
+		if int(bptr-v.AddrBanksPtr)/ps < size {
+			size = int(bptr-v.AddrBanksPtr) / ps
+		}
+	}
+
+	bptrs := map[uint32]bool{}
+	for i := 0; i < size; i++ {
+		bptrs[decPtr(banks[i*ps:i*ps+ps])] = true
+	}
+
+	// Find size of each map table.
+	v.sizeMapTable = make([]int, size)
+	maps := make([]byte, 256*ps)
+	for i := 0; i < size; i++ {
+		bptr := decPtr(banks[i*ps : i*ps+ps])
+		v.ROM.Seek(int64(bptr), 0)
+		v.ROM.Read(maps)
+		v.sizeMapTable[i] = 256
+		for j := 0; j < len(maps); j += ps {
+			mptr, valid := decPtrValid(maps[j : j+ps])
+			if !valid ||
+				// Compare current address to bank pointers.
+				(j > 0 && bptrs[bptr+uint32(j)]) ||
+				// Compare map pointer to bank pointers.
+				bptrs[mptr] ||
+				// Check that data at map pointer looks like map data.
+				!validMapHeader(v.ROM, mptr) {
+				v.sizeMapTable[i] = j / ps
+				break
+			}
+		}
+	}
+}
+
 func (v *Version) BankIndexSize() int {
-	return indexSizeBank
+	if len(v.sizeMapTable) == 0 {
+		panic("banks have not been scanned")
+	}
+
+	return len(v.sizeMapTable)
 }
 
 func (v *Version) Banks() []pkm.Bank {
-	a := make([]pkm.Bank, indexSizeBank)
+	if len(v.sizeMapTable) == 0 {
+		panic("banks have not been scanned")
+	}
+
+	a := make([]pkm.Bank, len(v.sizeMapTable))
 	for i := range a {
 		a[i] = Bank{v: v, i: i}
 	}
@@ -256,18 +334,39 @@ func (v *Version) Banks() []pkm.Bank {
 }
 
 func (v *Version) BankByIndex(index int) pkm.Bank {
-	if index < 0 || index >= indexSizeBank {
+	if len(v.sizeMapTable) == 0 {
+		panic("banks have not been scanned")
+	}
+
+	if index < 0 || index >= len(v.sizeMapTable) {
 		panic("bank index out of bounds")
 	}
 	return Bank{v: v, i: index}
 }
 
 func (v *Version) AllMaps() []pkm.Map {
-	// TODO
-	return nil
+	if len(v.sizeMapTable) == 0 {
+		panic("banks have not been scanned")
+	}
+
+	maps := make([]pkm.Map, 0, 520)
+	for b, size := range v.sizeMapTable {
+		for i := 0; i < size; i++ {
+			maps = append(maps, Map{v: v, b: b, i: i})
+		}
+	}
+	return maps
 }
 
 func (v *Version) MapByName(name string) pkm.Map {
-	// TODO
+	if len(v.sizeMapTable) == 0 {
+		panic("banks have not been scanned")
+	}
+
+	for _, m := range v.AllMaps() {
+		if name == m.Name() {
+			return m
+		}
+	}
 	return nil
 }

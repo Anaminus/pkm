@@ -89,8 +89,8 @@ func (b Bank) MapByName(name string) pkm.Map {
 }
 
 type Map struct {
-	v *Version
-	i int
+	v    *Version
+	b, i int
 }
 
 func (m Map) BankIndex() int {
