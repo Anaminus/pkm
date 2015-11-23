@@ -107,3 +107,8 @@ func (m Map) Encounters() {
 	// TODO
 	return
 }
+
+func (m Map) Name() string {
+	// TODO
+	return ""
+}
