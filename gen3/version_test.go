@@ -232,4 +232,52 @@ func TestVersion(t *testing.T) {
 	if ver.TMByName(ver.TMByIndex(ver.TMIndexSize()-1).Name()) == nil {
 		t.Errorf("TMByName: returned nil last species")
 	}
+
+	ExpectPanic(t, "BankIndexSize", func() {
+		ver.BankIndexSize()
+	})
+	ExpectPanic(t, "Banks", func() {
+		ver.Banks()
+	})
+	ExpectPanic(t, "BankByIndex", func() {
+		ver.BankByIndex(0)
+	})
+	ExpectPanic(t, "AllMaps", func() {
+		ver.AllMaps()
+	})
+	ExpectPanic(t, "MapByName", func() {
+		ver.MapByName("")
+	})
+
+	ver.ScanBanks()
+
+	ExpectPanic(t, "BankByIndex", func() {
+		ver.BankByIndex(257)
+	})
+
+	if v := ver.BankIndexSize(); v != 34 {
+		t.Errorf("BankIndexSize: unexpected result %d", v)
+	}
+	if v := ver.Banks(); len(v) != 34 {
+		t.Errorf("Banks: unexpected result length %d", len(v))
+	}
+	if v := ver.BankByIndex(0); v == nil || v.Index() != 0 {
+		t.Errorf("BankByIndex: unexpected result %d", v.Index)
+	}
+	if v := ver.AllMaps(); len(v) != 518 {
+		t.Errorf("AllMaps: unexpected result length %d", v)
+	}
+	if m := ver.MapByName("RUSTURF TUNNEL"); m == nil {
+		t.Errorf("MapByName: unexpected result <nil>")
+	} else if m.BankIndex() != 24 || m.Index() != 4 {
+		t.Errorf("MapByName: unexpected result %d.%d (%s)", m.BankIndex(), m.Index(), m.Name())
+	} else {
+		if v := ver.MapByName("Rusturf Tunnel"); v != m {
+			t.Errorf("MapByName: not case-insensitive")
+		}
+	}
+	if v := ver.MapByName("unknown"); v != nil {
+		t.Errorf("MapByName: expected nil result")
+		t.Logf("Result: %d.%d", v.BankIndex(), v.Index())
+	}
 }
