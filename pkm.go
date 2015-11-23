@@ -216,10 +216,10 @@ type Pokedex interface {
 
 // Species is a single species of pokemon in a Version.
 type Species interface {
-	// The name of the species.
-	Name() string
 	// The index of the species.
 	Index() int
+	// The name of the species.
+	Name() string
 	// The pokedex category of the species.
 	Category() string
 	// The height of the species.
@@ -479,8 +479,8 @@ func (w Weight) Pounds() float32 {
 
 // Item represents a single item for a Version.
 type Item interface {
-	Name() string
 	Index() int
+	Name() string
 	Description() string
 	Price() int
 }
@@ -489,8 +489,8 @@ type Item interface {
 
 // Ability represents a single pokemon ability in a Version.
 type Ability interface {
-	Name() string
 	Index() int
+	Name() string
 	Description() string
 }
 
@@ -498,8 +498,8 @@ type Ability interface {
 
 // Move represents a single pokemon move ina a Version.
 type Move interface {
-	Name() string
 	Index() int
+	Name() string
 	Description() string
 	Type() Type
 	BasePower() byte
@@ -562,8 +562,8 @@ func (f MoveFlags) KingsRock() bool  { return f&KingsRock != 0 }
 
 // TM represents a single TM or HM in a Version.
 type TM interface {
-	Name() string
 	Index() int
+	Name() string
 	Move() Move
 }
 
