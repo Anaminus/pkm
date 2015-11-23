@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	addrBankPtr      = 0x00084AA4
 	addrEncounterPtr = 0x00552d48
 	addrMapName      = 0x005A1480
 )
