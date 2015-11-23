@@ -363,6 +363,7 @@ func (v *Version) MapByName(name string) pkm.Map {
 		panic("banks have not been scanned")
 	}
 
+	name = strings.ToUpper(name)
 	for _, m := range v.AllMaps() {
 		if name == m.Name() {
 			return m
