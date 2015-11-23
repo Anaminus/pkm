@@ -604,6 +604,7 @@ type Bank interface {
 type Map interface {
 	BankIndex() int
 	Index() int
+	Name() string
 	Encounters()
 }
 
