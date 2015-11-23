@@ -25,6 +25,13 @@ var (
 		1, // 11 Show label on entry
 		1, // 12 In-battle field model id
 	)
+	structMapLabel = makeStruct(
+		1, // 0 Unknown
+		1, // 1 Unknown
+		1, // 2 Unknown
+		1, // 3 Unknown
+		4, // 4 Pointer to map name
+	)
 	structMapLayoutData = makeStruct(
 		4, // 0 Width
 		4, // 1 Height
