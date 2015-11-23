@@ -71,6 +71,13 @@ func decPtr(b []byte) uint32 {
 	return p - addrROM
 }
 
+func decPtrValid(b []byte) (ptr uint32, valid bool) {
+	ptr = binary.LittleEndian.Uint32(b)
+	valid = addrROM <= ptr && ptr < addrROM+0x01000000
+	ptr -= addrROM
+	return
+}
+
 func readPtr(r io.Reader) uint32 {
 	b := make([]byte, 4)
 	r.Read(b)
