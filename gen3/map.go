@@ -6,7 +6,6 @@ import (
 
 const (
 	addrEncounterPtr = 0x00552d48
-	addrMapName      = 0x005A1480
 )
 
 var (

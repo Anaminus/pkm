@@ -20,6 +20,7 @@ type Version struct {
 	AddrBanksPtr       uint32 // Pointer to bank pointer table.
 	AddrItemData       uint32 // Table of item data.
 	AddrLevelMovePtr   uint32 // Table of pointers to learned-move data.
+	AddrMapLabel       uint32 // Table of map label data.
 	AddrMoveName       uint32 // Table of move names.
 	AddrMoveData       uint32 // Table of move data.
 	AddrMoveDescPtr    uint32 // Table of pointers to move descriptions.
