@@ -65,8 +65,7 @@ type Bank struct {
 }
 
 func (b Bank) Index() int {
-	// TODO
-	return 0
+	return b.i
 }
 
 func (b Bank) MapIndexSize() int {
