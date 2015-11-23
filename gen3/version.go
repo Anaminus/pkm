@@ -257,7 +257,6 @@ func validMapHeader(rom io.ReadSeeker, ptr uint32) bool {
 	}
 	if _, v := decPtrValid(maph[8:12]); !v {
 		return false
-	} else {
 	}
 	return true
 }
