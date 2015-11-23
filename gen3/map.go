@@ -11,51 +11,51 @@ const (
 
 var (
 	structMapHeader = makeStruct(
-		4, // Map data
-		4, // Event data
-		4, // Map scripts
-		4, // Connections
-		2, // Music index
-		2, // Map pointer index
-		1, // Label index
-		1, // Visibility
-		1, // Weather
-		1, // Map type
-		2, // Unknown
-		1, // Show label on entry
-		1, // In-battle field model id
+		4, // 00 Map data
+		4, // 01 Event data
+		4, // 02 Map scripts
+		4, // 03 Connections
+		2, // 04 Music index
+		2, // 05 Map pointer index
+		1, // 06 Label index
+		1, // 07 Visibility
+		1, // 08 Weather
+		1, // 09 Map type
+		2, // 10 Unknown
+		1, // 11 Show label on entry
+		1, // 12 In-battle field model id
 	)
 	structMapLayoutData = makeStruct(
-		4, // Width
-		4, // Height
-		4, // Border
-		4, // Map data / Tile structure
-		4, // Global tileset
-		4, // Local tileset
-		1, // Border width
-		1, // Border height
+		4, // 0 Width
+		4, // 1 Height
+		4, // 2 Border
+		4, // 3 Map data / Tile structure
+		4, // 4 Global tileset
+		4, // 5 Local tileset
+		1, // 6 Border width
+		1, // 7 Border height
 	)
 	structTilesetHeader = makeStruct(
-		1, // Compressed
-		1, // Is primary
-		1, // Unknown
-		1, // Unknown
-		4, // Pointer to tileset image
-		4, // Pointer to color palettes
-		4, // Pointer to blocks
-		4, // Pointer to animation routine
-		4, // Pointer to behavior and background bytes
+		1, // 0 Compressed
+		1, // 1 Is primary
+		1, // 2 Unknown
+		1, // 3 Unknown
+		4, // 4 Pointer to tileset image
+		4, // 5 Pointer to color palettes
+		4, // 6 Pointer to blocks
+		4, // 7 Pointer to animation routine
+		4, // 8 Pointer to behavior and background bytes
 	)
 	structConnHeader = makeStruct(
-		4, // Amount of map connections
-		4, // Pointer to connection data
+		4, // 0 Amount of map connections
+		4, // 1 Pointer to connection data
 	)
 	structConnData = makeStruct(
-		4, // Connection direction
-		4, // Offset
-		1, // Map Bank
-		1, // Map Number
-		2, // Padding
+		4, // 0 Connection direction
+		4, // 1 Offset
+		1, // 2 Map Bank
+		1, // 3 Map Number
+		2, // 4 Padding
 	)
 )
 
