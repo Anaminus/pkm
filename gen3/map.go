@@ -2,6 +2,7 @@ package gen3
 
 import (
 	"github.com/anaminus/pkm"
+	"strings"
 )
 
 const (
@@ -113,6 +114,7 @@ func (b Bank) MapByIndex(index int) pkm.Map {
 }
 
 func (b Bank) MapByName(name string) pkm.Map {
+	name = strings.ToUpper(name)
 	for _, m := range b.Maps() {
 		if name == m.Name() {
 			return m
