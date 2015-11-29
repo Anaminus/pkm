@@ -642,9 +642,13 @@ type EncounterList interface {
 	SpeciesRate(index int) float32
 }
 
+// Encounter contains information about a single encounter.
 type Encounter interface {
+	// Returns the minimum level at which the species may be encountered.
 	MinLevel() int
+	// Returns the maximum level at which the species may be encountered.
 	MaxLevel() int
+	// The encountered species.
 	Species() Species
 }
 
