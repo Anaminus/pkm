@@ -623,6 +623,8 @@ type Map interface {
 
 ////////////////////////////////////////////////////////////////
 
+// EncounterList contains information about the species that can be
+// encountered in a particular area type of a map.
 type EncounterList interface {
 	// Returns a name representing the type of area within a map where
 	// encounters can occur.
