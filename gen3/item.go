@@ -46,7 +46,7 @@ func (i Item) Description() string {
 		structItemData,
 		5,
 	)
-	i.v.ROM.Seek(int64(decPtr(b)), 0)
+	i.v.ROM.Seek(decPtr(b).ROM(), 0)
 	return readTextString(i.v.ROM)
 }
 

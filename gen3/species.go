@@ -106,7 +106,7 @@ func (s Species) Description() string {
 		structDexData,
 		3,
 	)
-	s.v.ROM.Seek(int64(decPtr(b)), 0)
+	s.v.ROM.Seek(decPtr(b).ROM(), 0)
 	return readTextString(s.v.ROM)
 }
 
@@ -334,7 +334,7 @@ func (s Species) LearnedMoves() []pkm.LevelMove {
 		s.i,
 		structPtr,
 	)
-	s.v.ROM.Seek(int64(decPtr(b)), 0)
+	s.v.ROM.Seek(decPtr(b).ROM(), 0)
 	b = make([]byte, 0, 32)
 	q := make([]byte, 2)
 	for {
@@ -356,7 +356,7 @@ func (s Species) LearnedMoves() []pkm.LevelMove {
 
 func (s Species) CanLearnTM(tm pkm.TM) bool {
 	b := make([]byte, 1)
-	s.v.ROM.Seek(int64(s.v.AddrSpeciesTM)+int64(s.i*8+tm.Index()/8), 0)
+	s.v.ROM.Seek(s.v.AddrSpeciesTM.ROM()+int64(s.i*8+tm.Index()/8), 0)
 	s.v.ROM.Read(b)
 	return b[0]&(1<<uint(tm.Index()%8)) != 0
 }

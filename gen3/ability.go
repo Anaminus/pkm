@@ -32,6 +32,6 @@ func (a Ability) Description() string {
 		a.i,
 		structPtr,
 	)
-	a.v.ROM.Seek(int64(decPtr(b)), 0)
+	a.v.ROM.Seek(decPtr(b).ROM(), 0)
 	return readTextString(a.v.ROM)
 }

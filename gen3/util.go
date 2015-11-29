@@ -7,7 +7,7 @@ import (
 )
 
 const addrROM = 0x08000000
-const addrGameCode = 0xAC
+const addrGameCode ptr = 0x080000AC
 const strTerm = 0xFF
 
 var defaultCodec = CodecUTF8
@@ -65,23 +65,27 @@ func decUint64(b []byte) uint64 {
 	return binary.LittleEndian.Uint64(b)
 }
 
-func decPtr(b []byte) uint32 {
+////////////////////////////////////////////////////////////////
+
+type ptr uint32
+
+func (p ptr) ValidROM() bool {
+	return addrROM <= p && p < addrROM+0x01000000
+}
+
+func (p ptr) ROM() int64 {
+	if !p.ValidROM() {
+		return 0
+	}
+	return int64(p - addrROM)
+}
+
+func decPtr(b []byte) ptr {
 	p := binary.LittleEndian.Uint32(b)
-	return p - addrROM
+	return ptr(p)
 }
 
-func validPtr(ptr uint32) bool {
-	return addrROM <= ptr && ptr < addrROM+0x01000000
-}
-
-func decPtrValid(b []byte) (ptr uint32, valid bool) {
-	ptr = binary.LittleEndian.Uint32(b)
-	valid = validPtr(ptr)
-	ptr -= addrROM
-	return
-}
-
-func readPtr(r io.Reader) uint32 {
+func readPtr(r io.Reader) ptr {
 	b := make([]byte, 4)
 	r.Read(b)
 	return decPtr(b)
@@ -115,7 +119,7 @@ func (s stct) FieldOffset(f int) int {
 	return s[f]
 }
 
-func readStruct(r io.ReadSeeker, addr uint32, index int, s stct, fields ...int) []byte {
+func readStruct(r io.ReadSeeker, addr ptr, index int, s stct, fields ...int) []byte {
 	if len(fields) == 0 {
 		fields = make([]int, s.Len())
 		for i := range fields {
@@ -123,7 +127,7 @@ func readStruct(r io.ReadSeeker, addr uint32, index int, s stct, fields ...int) 
 		}
 	}
 
-	off, _ := r.Seek(int64(addr)+int64(index*s.Size()), 0)
+	off, _ := r.Seek(addr.ROM()+int64(index*s.Size()), 0)
 
 	n := 0
 	for _, f := range fields {

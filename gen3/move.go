@@ -52,7 +52,7 @@ func (m Move) Description() string {
 		m.i-1,
 		structPtr,
 	)
-	m.v.ROM.Seek(int64(decPtr(b)), 0)
+	m.v.ROM.Seek(decPtr(b).ROM(), 0)
 	return readTextString(m.v.ROM)
 }
 

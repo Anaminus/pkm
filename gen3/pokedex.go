@@ -13,7 +13,7 @@ var (
 type pokedexData struct {
 	Name    string
 	Size    int
-	Address uint32
+	Address ptr
 }
 
 type Pokedex struct {
@@ -33,7 +33,7 @@ func (p Pokedex) Species(number int) pkm.Species {
 	if number <= 0 || number > p.Size() {
 		panic("species number out of bounds")
 	}
-	p.v.ROM.Seek(int64(p.v.pokedex[p.i].Address), 0)
+	p.v.ROM.Seek(p.v.pokedex[p.i].Address.ROM(), 0)
 	var species pkm.Species
 	for i, q := 1, make([]byte, 2); i <= indexSizeSpecies; i++ {
 		p.v.ROM.Read(q)
@@ -47,7 +47,7 @@ func (p Pokedex) Species(number int) pkm.Species {
 
 func (p Pokedex) AllSpecies() []pkm.Species {
 	a := make([]pkm.Species, p.Size())
-	p.v.ROM.Seek(int64(p.v.pokedex[p.i].Address), 0)
+	p.v.ROM.Seek(p.v.pokedex[p.i].Address.ROM(), 0)
 	for i, q := 1, make([]byte, 2); i < p.Size(); i++ {
 		p.v.ROM.Read(q)
 		if n := int(decUint16(q)); n <= p.Size() {

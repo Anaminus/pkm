@@ -133,7 +133,7 @@ func (m Map) Index() int {
 }
 
 func (m Map) Encounters() []pkm.EncounterList {
-	ptrs := [4]uint32{}
+	ptrs := [4]ptr{}
 	for p := 0; p < len(ptrs); p++ {
 		for i := 0; ; i++ {
 			b := readStruct(
@@ -167,7 +167,7 @@ func (m Map) Encounters() []pkm.EncounterList {
 }
 
 func (m Map) Name() string {
-	m.v.ROM.Seek(int64(m.v.AddrBanksPtr), 0)
+	m.v.ROM.Seek(m.v.AddrBanksPtr.ROM(), 0)
 	b := readStruct(
 		m.v.ROM,
 		readPtr(m.v.ROM),
@@ -193,7 +193,7 @@ func (m Map) Name() string {
 		int(b[0]),
 		structMapLabel,
 	)
-	m.v.ROM.Seek(int64(decPtr(b[4:8])), 0)
+	m.v.ROM.Seek(decPtr(b[4:8]).ROM(), 0)
 	return readTextString(m.v.ROM)
 }
 
@@ -201,7 +201,7 @@ func (m Map) Name() string {
 
 type Encounter struct {
 	v *Version
-	p uint32
+	p ptr
 	i int
 }
 
@@ -240,8 +240,8 @@ func (e Encounter) Species() pkm.Species {
 
 ////////////////////////////////////////////////////////////////
 
-func encounterRate(v *Version, p uint32) byte {
-	if !validPtr(p) {
+func encounterRate(v *Version, p ptr) byte {
+	if !p.ValidROM() {
 		return 0
 	}
 	b := readStruct(
@@ -254,8 +254,8 @@ func encounterRate(v *Version, p uint32) byte {
 	return b[0]
 }
 
-func encounters(v *Version, p uint32, s int) []pkm.Encounter {
-	if !validPtr(p) {
+func encounters(v *Version, p ptr, s int) []pkm.Encounter {
+	if !p.ValidROM() {
 		return nil
 	}
 	b := readStruct(
@@ -265,19 +265,19 @@ func encounters(v *Version, p uint32, s int) []pkm.Encounter {
 		structEncounterHeader,
 		2,
 	)
-	ptr := decPtr(b)
+	p = decPtr(b)
 	encounters := make([]pkm.Encounter, s)
 	for i := range encounters {
-		encounters[i] = Encounter{v: v, p: ptr, i: i}
+		encounters[i] = Encounter{v: v, p: p, i: i}
 	}
 	return encounters
 }
 
-func encounter(v *Version, p uint32, s, index int) pkm.Encounter {
+func encounter(v *Version, p ptr, s, index int) pkm.Encounter {
 	if index < 0 || index >= s {
 		panic("encounter index out of bounds")
 	}
-	if !validPtr(p) {
+	if !p.ValidROM() {
 		return nil
 	}
 	b := readStruct(
@@ -294,7 +294,7 @@ func encounter(v *Version, p uint32, s, index int) pkm.Encounter {
 
 type EncounterGrass struct {
 	v *Version
-	p uint32
+	p ptr
 }
 
 func (e EncounterGrass) Name() string {
@@ -302,7 +302,7 @@ func (e EncounterGrass) Name() string {
 }
 
 func (e EncounterGrass) Populated() bool {
-	return validPtr(e.p)
+	return e.p.ValidROM()
 }
 
 func (e EncounterGrass) EncounterIndexSize() int {
@@ -344,7 +344,7 @@ func (e EncounterGrass) SpeciesRate(index int) (rate float32) {
 
 type EncounterWater struct {
 	v *Version
-	p uint32
+	p ptr
 }
 
 func (e EncounterWater) Name() string {
@@ -352,7 +352,7 @@ func (e EncounterWater) Name() string {
 }
 
 func (e EncounterWater) Populated() bool {
-	return validPtr(e.p)
+	return e.p.ValidROM()
 }
 
 func (e EncounterWater) EncounterIndexSize() int {
@@ -394,7 +394,7 @@ func (e EncounterWater) SpeciesRate(index int) (rate float32) {
 
 type EncounterRock struct {
 	v *Version
-	p uint32
+	p ptr
 }
 
 func (e EncounterRock) Name() string {
@@ -402,7 +402,7 @@ func (e EncounterRock) Name() string {
 }
 
 func (e EncounterRock) Populated() bool {
-	return validPtr(e.p)
+	return e.p.ValidROM()
 }
 
 func (e EncounterRock) EncounterIndexSize() int {
@@ -444,7 +444,7 @@ func (e EncounterRock) SpeciesRate(index int) (rate float32) {
 
 type EncounterRod struct {
 	v *Version
-	p uint32
+	p ptr
 }
 
 func (e EncounterRod) Name() string {
@@ -452,7 +452,7 @@ func (e EncounterRod) Name() string {
 }
 
 func (e EncounterRod) Populated() bool {
-	return validPtr(e.p)
+	return e.p.ValidROM()
 }
 
 func (e EncounterRod) EncounterIndexSize() int {
