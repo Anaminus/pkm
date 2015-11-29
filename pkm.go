@@ -315,8 +315,8 @@ func (g GenderRatio) String() string {
 		return "Genderless"
 	default:
 		return fmt.Sprintf("%.2f%% male / %.2f%% female",
-			float32(g)/254*100,
 			(1-float32(g)/254)*100,
+			float32(g)/254*100,
 		)
 	}
 }
