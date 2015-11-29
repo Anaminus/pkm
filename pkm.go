@@ -505,7 +505,7 @@ type Ability interface {
 
 ////////////////////////////////////////////////////////////////
 
-// Move represents a single pokemon move ina a Version.
+// Move represents a single pokemon move in a Version.
 type Move interface {
 	Index() int
 	Name() string
