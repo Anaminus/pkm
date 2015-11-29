@@ -240,7 +240,7 @@ func (e Encounter) Species() pkm.Species {
 
 ////////////////////////////////////////////////////////////////
 
-func encounterRate(v *Version, p ptr) byte {
+func encounterRate(v *Version, p ptr) float32 {
 	if !p.ValidROM() {
 		return 0
 	}
@@ -251,7 +251,7 @@ func encounterRate(v *Version, p ptr) byte {
 		structEncounterHeader,
 		0,
 	)
-	return b[0]
+	return float32(b[0]) / 255
 }
 
 func encounters(v *Version, p ptr, s int) []pkm.Encounter {
@@ -309,7 +309,7 @@ func (e EncounterGrass) EncounterIndexSize() int {
 	return 12
 }
 
-func (e EncounterGrass) EncounterRate() byte {
+func (e EncounterGrass) EncounterRate() float32 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -359,7 +359,7 @@ func (e EncounterWater) EncounterIndexSize() int {
 	return 5
 }
 
-func (e EncounterWater) EncounterRate() byte {
+func (e EncounterWater) EncounterRate() float32 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -409,7 +409,7 @@ func (e EncounterRock) EncounterIndexSize() int {
 	return 5
 }
 
-func (e EncounterRock) EncounterRate() byte {
+func (e EncounterRock) EncounterRate() float32 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -459,7 +459,7 @@ func (e EncounterRod) EncounterIndexSize() int {
 	return 10
 }
 
-func (e EncounterRod) EncounterRate() byte {
+func (e EncounterRod) EncounterRate() float32 {
 	return encounterRate(e.v, e.p)
 }
 

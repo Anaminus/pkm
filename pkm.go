@@ -635,9 +635,9 @@ type EncounterList interface {
 	// Returns whether species can be encountered in the area (which implies
 	// that the map contains the area type).
 	Populated() bool
-	// Returns the probability (n/255) that traversing a block in the area
-	// will lead to an encounter. Returns 0 if the area is unpopulated.
-	EncounterRate() byte
+	// Returns the probability (0-1) that traversing a block in the area will
+	// lead to an encounter. Returns 0 if the area is unpopulated.
+	EncounterRate() float32
 	// Returns the maximum size of the encounter table.
 	EncounterIndexSize() int
 	// Returns a list of possible species encounters. Returns nil if the area

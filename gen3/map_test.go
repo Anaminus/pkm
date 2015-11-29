@@ -82,7 +82,7 @@ func TestEncounters(t *testing.T) {
 			t.Errorf("EncounterList.Populated: unexpected result %t", v)
 		}
 		if v := e.EncounterRate(); v != 0 {
-			t.Errorf("EncounterList.EncounterRate: unexpected result %d", v)
+			t.Errorf("EncounterList.EncounterRate: unexpected result %f", v)
 		}
 		if v := e.EncounterIndexSize(); v != 12 {
 			t.Errorf("EncounterList.EncounterIndexSize: unexpected result %d", v)
@@ -233,8 +233,8 @@ func TestEncounters(t *testing.T) {
 		if v := e.Populated(); !v {
 			t.Errorf("EncounterList.Populated: %d: unexpected result %t", i, v)
 		}
-		if v := e.EncounterRate(); v != erate[i] {
-			t.Errorf("EncounterList.EncounterRate: %d: unexpected result %d", i, v)
+		if v := e.EncounterRate(); byte(v*255) != erate[i] {
+			t.Errorf("EncounterList.EncounterRate: %d: unexpected result %f", i, v)
 		}
 		if v := e.EncounterIndexSize(); v != size[i] {
 			t.Errorf("EncounterList.EncounterIndexSize: %d: unexpected result %d", i, v)
