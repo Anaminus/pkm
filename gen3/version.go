@@ -18,6 +18,7 @@ type Version struct {
 	AddrAbilityName    uint32 // Table of ability names.
 	AddrAbilityDescPtr uint32 // Table of pointers to ability descriptions.
 	AddrBanksPtr       uint32 // Pointer to bank pointer table.
+	AddrEncounterList  uint32 // List of map references to encounter table pointers.
 	AddrItemData       uint32 // Table of item data.
 	AddrLevelMovePtr   uint32 // Table of pointers to learned-move data.
 	AddrMapLabel       uint32 // Table of map label data.
