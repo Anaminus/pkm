@@ -523,14 +523,14 @@ const (
 	SuperRod
 )
 
-func (r Rod) String() string {
+func (r Rod) String() (s string) {
 	switch r {
 	case OldRod:
-		return "Old"
+		s = "Old"
 	case GoodRod:
-		return "Good"
+		s = "Good"
 	case SuperRod:
-		return "Super"
+		s = "Super"
 	}
-	return ""
+	return
 }
