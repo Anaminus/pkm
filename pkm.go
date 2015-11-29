@@ -613,7 +613,39 @@ type Map interface {
 	BankIndex() int
 	Index() int
 	Name() string
-	Encounters()
+	Encounters() []EncounterList
+	EncountersByIndex(index int) EncounterList
+}
+
+////////////////////////////////////////////////////////////////
+
+type EncounterList interface {
+	// Returns a name representing the type of area within a map where
+	// encounters can occur.
+	Name() string
+	// Returns whether species can be encountered in the area (which implies
+	// that the map contains the area type).
+	Populated() bool
+	// Returns the probability (n/255) that traversing a block in the area
+	// will lead to an encounter. Returns 0 if the area is unpopulated.
+	EncounterRate() byte
+	// Returns the maximum size of the encounter table.
+	EncounterIndexSize() int
+	// Returns a list of possible species encounters. Returns nil if the area
+	// is unpopulated.
+	Encounters() []Encounter
+	// Returns the species encounter at the given index. Returns nil if the
+	// area is unpopulated.
+	Encounter(index int) Encounter
+	// Returns the probability (0-1) that the species encounter at the given
+	// index will be selected.
+	SpeciesRate(index int) float32
+}
+
+type Encounter interface {
+	MinLevel() int
+	MaxLevel() int
+	Species() Species
 }
 
 ////////////////////////////////////////////////////////////////
