@@ -136,7 +136,7 @@ func (m Map) Index() int {
 
 func (m Map) Encounters() []pkm.EncounterList {
 	ptrs := [4]uint32{}
-	for i := 0; i < len(ptrs); i++ {
+	for p := 0; p < len(ptrs); p++ {
 		for i := 0; ; i++ {
 			b := readStruct(
 				m.v.ROM,
@@ -153,9 +153,9 @@ func (m Map) Encounters() []pkm.EncounterList {
 					m.v.AddrEncounterList,
 					i,
 					structEncounterPtrs,
-					index+3,
+					p+3,
 				)
-				ptrs[i] = decPtr(b)
+				ptrs[p] = decPtr(b)
 				break
 			}
 		}
