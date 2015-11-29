@@ -63,6 +63,25 @@ var (
 		1, // 3 Map Number
 		2, // 4 Padding
 	)
+	structEncounterPtrs = makeStruct(
+		1, // 0 Bank
+		1, // 1 Map
+		2, // 2 Padding
+		4, // 3 Pointer to encounter table (grass)
+		4, // 4 Pointer to encounter table (water)
+		4, // 5 Pointer to encounter table (rock)
+		4, // 6 Pointer to encounter table (rod)
+	)
+	structEncounterHeader = makeStruct(
+		1, // 0 Encounter rate
+		3, // 1 Padding
+		4, // 2 Pointer to encounter table
+	)
+	structEncounter = makeStruct(
+		1, // 0 MinLevel
+		1, // 1 MaxLevel
+		2, // 2 Species
+	)
 )
 
 type Bank struct {
@@ -115,9 +134,59 @@ func (m Map) Index() int {
 	return m.i
 }
 
-func (m Map) Encounters() {
-	// TODO
-	return
+func (m Map) getEncounterPtr(index int) uint32 {
+	for i := 0; ; i++ {
+		b := readStruct(
+			m.v.ROM,
+			m.v.AddrEncounterList,
+			i,
+			structEncounterPtrs,
+			0, 1,
+		)
+		if b[0] == 0xFF && b[1] == 0xFF {
+			break
+		} else if int(b[0]) == m.BankIndex() && int(b[1]) == m.Index() {
+			b := readStruct(
+				m.v.ROM,
+				m.v.AddrEncounterList,
+				i,
+				structEncounterPtrs,
+				index+3,
+			)
+			return decPtr(b)
+		}
+	}
+	return 0
+}
+
+func (m Map) Encounters() []pkm.EncounterList {
+	ptrs := [4]uint32{}
+	for i := 0; i < len(ptrs); i++ {
+		ptrs[i] = m.getEncounterPtr(i)
+	}
+	return []pkm.EncounterList{
+		EncounterGrass{v: m.v, p: ptrs[0]},
+		EncounterWater{v: m.v, p: ptrs[1]},
+		EncounterRock{v: m.v, p: ptrs[2]},
+		EncounterRod{v: m.v, p: ptrs[3]},
+	}
+}
+
+func (m Map) EncountersByIndex(index int) (e pkm.EncounterList) {
+	if index < 0 || index >= 4 {
+		panic("encounter type index out of bounds")
+	}
+	switch index {
+	case 0:
+		e = EncounterGrass{v: m.v, p: m.getEncounterPtr(index)}
+	case 1:
+		e = EncounterWater{v: m.v, p: m.getEncounterPtr(index)}
+	case 2:
+		e = EncounterRock{v: m.v, p: m.getEncounterPtr(index)}
+	case 3:
+		e = EncounterRod{v: m.v, p: m.getEncounterPtr(index)}
+	}
+	return e
 }
 
 func (m Map) Name() string {
@@ -149,4 +218,342 @@ func (m Map) Name() string {
 	)
 	m.v.ROM.Seek(int64(decPtr(b[4:8])), 0)
 	return readTextString(m.v.ROM)
+}
+
+////////////////////////////////////////////////////////////////
+
+type Encounter struct {
+	v *Version
+	p uint32
+	i int
+}
+
+func (e Encounter) MinLevel() int {
+	b := readStruct(
+		e.v.ROM,
+		e.p,
+		e.i,
+		structEncounter,
+		0,
+	)
+	return int(b[0])
+}
+
+func (e Encounter) MaxLevel() int {
+	b := readStruct(
+		e.v.ROM,
+		e.p,
+		e.i,
+		structEncounter,
+		1,
+	)
+	return int(b[0])
+}
+
+func (e Encounter) Species() pkm.Species {
+	b := readStruct(
+		e.v.ROM,
+		e.p,
+		e.i,
+		structEncounter,
+		2,
+	)
+	return Species{v: e.v, i: int(decUint16(b))}
+}
+
+////////////////////////////////////////////////////////////////
+
+func encounterRate(v *Version, p uint32) byte {
+	if !validPtr(p) {
+		return 0
+	}
+	b := readStruct(
+		v.ROM,
+		p,
+		0,
+		structEncounterHeader,
+		0,
+	)
+	return b[0]
+}
+
+func encounters(v *Version, p uint32, s int) []pkm.Encounter {
+	if !validPtr(p) {
+		return nil
+	}
+	b := readStruct(
+		v.ROM,
+		p,
+		0,
+		structEncounterHeader,
+		2,
+	)
+	ptr := decPtr(b)
+	encounters := make([]pkm.Encounter, s)
+	for i := range encounters {
+		encounters[i] = Encounter{v: v, p: ptr, i: i}
+	}
+	return encounters
+}
+
+func encounter(v *Version, p uint32, s, index int) pkm.Encounter {
+	if index < 0 || index >= s {
+		panic("encounter index out of bounds")
+	}
+	if !validPtr(p) {
+		return nil
+	}
+	b := readStruct(
+		v.ROM,
+		p,
+		0,
+		structEncounterHeader,
+		2,
+	)
+	return Encounter{v: v, p: decPtr(b), i: index}
+}
+
+////////////////////////////////////////////////////////////////
+
+type EncounterGrass struct {
+	v *Version
+	p uint32
+}
+
+func (e EncounterGrass) Name() string {
+	return "Grass"
+}
+
+func (e EncounterGrass) Populated() bool {
+	return validPtr(e.p)
+}
+
+func (e EncounterGrass) EncounterIndexSize() int {
+	return 12
+}
+
+func (e EncounterGrass) EncounterRate() byte {
+	return encounterRate(e.v, e.p)
+}
+
+func (e EncounterGrass) Encounters() []pkm.Encounter {
+	return encounters(e.v, e.p, e.EncounterIndexSize())
+}
+
+func (e EncounterGrass) Encounter(index int) pkm.Encounter {
+	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
+}
+
+func (e EncounterGrass) SpeciesRate(index int) (rate float32) {
+	if index < 0 || index >= e.EncounterIndexSize() {
+		panic("species rate index out of bounds")
+	}
+	switch index {
+	case 0, 1:
+		rate = 0.2
+	case 2, 3, 4, 5:
+		rate = 0.1
+	case 6, 7:
+		rate = 0.05
+	case 8, 9:
+		rate = 0.04
+	case 10, 11:
+		rate = 0.01
+	}
+	return
+}
+
+////////////////////////////////////////////////////////////////
+
+type EncounterWater struct {
+	v *Version
+	p uint32
+}
+
+func (e EncounterWater) Name() string {
+	return "Water"
+}
+
+func (e EncounterWater) Populated() bool {
+	return validPtr(e.p)
+}
+
+func (e EncounterWater) EncounterIndexSize() int {
+	return 5
+}
+
+func (e EncounterWater) EncounterRate() byte {
+	return encounterRate(e.v, e.p)
+}
+
+func (e EncounterWater) Encounters() []pkm.Encounter {
+	return encounters(e.v, e.p, e.EncounterIndexSize())
+}
+
+func (e EncounterWater) Encounter(index int) pkm.Encounter {
+	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
+}
+
+func (e EncounterWater) SpeciesRate(index int) (rate float32) {
+	if index < 0 || index >= e.EncounterIndexSize() {
+		panic("species rate index out of bounds")
+	}
+	switch index {
+	case 0:
+		rate = 0.6
+	case 1:
+		rate = 0.3
+	case 2:
+		rate = 0.05
+	case 3:
+		rate = 0.04
+	case 4:
+		rate = 0.01
+	}
+	return
+}
+
+////////////////////////////////////////////////////////////////
+
+type EncounterRock struct {
+	v *Version
+	p uint32
+}
+
+func (e EncounterRock) Name() string {
+	return "Rock"
+}
+
+func (e EncounterRock) Populated() bool {
+	return validPtr(e.p)
+}
+
+func (e EncounterRock) EncounterIndexSize() int {
+	return 5
+}
+
+func (e EncounterRock) EncounterRate() byte {
+	return encounterRate(e.v, e.p)
+}
+
+func (e EncounterRock) Encounters() []pkm.Encounter {
+	return encounters(e.v, e.p, e.EncounterIndexSize())
+}
+
+func (e EncounterRock) Encounter(index int) pkm.Encounter {
+	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
+}
+
+func (e EncounterRock) SpeciesRate(index int) (rate float32) {
+	if index < 0 || index >= e.EncounterIndexSize() {
+		panic("species rate index out of bounds")
+	}
+	switch index {
+	case 0:
+		rate = 0.6
+	case 1:
+		rate = 0.3
+	case 2:
+		rate = 0.05
+	case 3:
+		rate = 0.04
+	case 4:
+		rate = 0.01
+	}
+	return
+}
+
+////////////////////////////////////////////////////////////////
+
+type EncounterRod struct {
+	v *Version
+	p uint32
+}
+
+func (e EncounterRod) Name() string {
+	return "Rod"
+}
+
+func (e EncounterRod) Populated() bool {
+	return validPtr(e.p)
+}
+
+func (e EncounterRod) EncounterIndexSize() int {
+	return 10
+}
+
+func (e EncounterRod) EncounterRate() byte {
+	return encounterRate(e.v, e.p)
+}
+
+func (e EncounterRod) Encounters() []pkm.Encounter {
+	return encounters(e.v, e.p, e.EncounterIndexSize())
+}
+
+func (e EncounterRod) Encounter(index int) pkm.Encounter {
+	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
+}
+
+func (e EncounterRod) SpeciesRate(index int) (rate float32) {
+	if index < 0 || index >= e.EncounterIndexSize() {
+		panic("species rate index out of bounds")
+	}
+	switch index {
+	case 0:
+		rate = 0.7
+	case 1:
+		rate = 0.3
+	case 2:
+		rate = 0.6
+	case 3:
+		rate = 0.2
+	case 4:
+		rate = 0.2
+	case 5:
+		rate = 0.4
+	case 6:
+		rate = 0.4
+	case 7:
+		rate = 0.15
+	case 8:
+		rate = 0.04
+	case 9:
+		rate = 0.01
+	}
+	return
+}
+
+func (e EncounterRod) RodType(index int) (rod Rod) {
+	if index < 0 || index >= e.EncounterIndexSize() {
+		panic("rod type index out of bounds")
+	}
+	switch index {
+	case 0, 1:
+		rod = OldRod
+	case 2, 3, 4:
+		rod = GoodRod
+	case 5, 6, 7, 8, 9:
+		rod = SuperRod
+	}
+	return
+}
+
+type Rod byte
+
+const (
+	OldRod Rod = iota
+	GoodRod
+	SuperRod
+)
+
+func (r Rod) String() string {
+	switch r {
+	case OldRod:
+		return "Old"
+	case GoodRod:
+		return "Good"
+	case SuperRod:
+		return "Super"
+	}
+	return ""
 }
