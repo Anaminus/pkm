@@ -610,9 +610,14 @@ type Bank interface {
 
 // Map represents map data in a Version.
 type Map interface {
+	// Returns the bank index of the map.
 	BankIndex() int
+	// Returns the index of the map.
 	Index() int
+	// Returns
 	Name() string
+	// Returns a list of all the areas in the map which may contain
+	// encounters.
 	Encounters() []EncounterList
 }
 
