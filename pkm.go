@@ -355,21 +355,21 @@ func (l LevelType) String() string {
 type EggGroup byte
 
 const (
-	EggMonster      = 1
-	EggWater1       = 2
-	EggBug          = 3
-	EggFlying       = 4
-	EggField        = 5
-	EggFairy        = 6
-	EggGrass        = 7
-	EggHumanLike    = 8
-	EggWater3       = 9
-	EggMineral      = 10
-	EggAmorphous    = 11
-	EggWater2       = 12
-	EggDitto        = 13
-	EggDragon       = 14
-	EggUndiscovered = 15
+	EggMonster      EggGroup = 1
+	EggWater1                = 2
+	EggBug                   = 3
+	EggFlying                = 4
+	EggField                 = 5
+	EggFairy                 = 6
+	EggGrass                 = 7
+	EggHumanLike             = 8
+	EggWater3                = 9
+	EggMineral               = 10
+	EggAmorphous             = 11
+	EggWater2                = 12
+	EggDitto                 = 13
+	EggDragon                = 14
+	EggUndiscovered          = 15
 )
 
 func (g EggGroup) String() string {
@@ -412,16 +412,16 @@ func (g EggGroup) String() string {
 type Color byte
 
 const (
-	ColorRed    = 0
-	ColorBlue   = 1
-	ColorYellow = 2
-	ColorGreen  = 3
-	ColorBlack  = 4
-	ColorBrown  = 5
-	ColorPurple = 6
-	ColorGray   = 7
-	ColorWhite  = 8
-	ColorPink   = 9
+	ColorRed    Color = 0
+	ColorBlue         = 1
+	ColorYellow       = 2
+	ColorGreen        = 3
+	ColorBlack        = 4
+	ColorBrown        = 5
+	ColorPurple       = 6
+	ColorGray         = 7
+	ColorWhite        = 8
+	ColorPink         = 9
 )
 
 func (c Color) String() string {
@@ -667,24 +667,24 @@ type Encounter interface {
 type Type byte
 
 const (
-	TypeNormal   = 0
-	TypeFighting = 1
-	TypeFlying   = 2
-	TypePoison   = 3
-	TypeGround   = 4
-	TypeRock     = 5
-	TypeBug      = 6
-	TypeGhost    = 7
-	TypeSteel    = 8
-	TypeCurse    = 9
-	TypeFire     = 10
-	TypeWater    = 11
-	TypeGrass    = 12
-	TypeElectric = 13
-	TypePsychic  = 14
-	TypeIce      = 15
-	TypeDragon   = 16
-	TypeDark     = 17
+	TypeNormal   Type = 0
+	TypeFighting      = 1
+	TypeFlying        = 2
+	TypePoison        = 3
+	TypeGround        = 4
+	TypeRock          = 5
+	TypeBug           = 6
+	TypeGhost         = 7
+	TypeSteel         = 8
+	TypeCurse         = 9
+	TypeFire          = 10
+	TypeWater         = 11
+	TypeGrass         = 12
+	TypeElectric      = 13
+	TypePsychic       = 14
+	TypeIce           = 15
+	TypeDragon        = 16
+	TypeDark          = 17
 )
 
 func (t Type) String() string {
