@@ -5,10 +5,6 @@ import (
 	"strings"
 )
 
-const (
-	addrEncounterPtr = 0x00552d48
-)
-
 var (
 	structMapHeader = makeStruct(
 		4, // 00 Map data
