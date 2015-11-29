@@ -614,7 +614,6 @@ type Map interface {
 	Index() int
 	Name() string
 	Encounters() []EncounterList
-	EncountersByIndex(index int) EncounterList
 }
 
 ////////////////////////////////////////////////////////////////

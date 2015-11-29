@@ -134,35 +134,31 @@ func (m Map) Index() int {
 	return m.i
 }
 
-func (m Map) getEncounterPtr(index int) uint32 {
-	for i := 0; ; i++ {
-		b := readStruct(
-			m.v.ROM,
-			m.v.AddrEncounterList,
-			i,
-			structEncounterPtrs,
-			0, 1,
-		)
-		if b[0] == 0xFF && b[1] == 0xFF {
-			break
-		} else if int(b[0]) == m.BankIndex() && int(b[1]) == m.Index() {
+func (m Map) Encounters() []pkm.EncounterList {
+	ptrs := [4]uint32{}
+	for i := 0; i < len(ptrs); i++ {
+		for i := 0; ; i++ {
 			b := readStruct(
 				m.v.ROM,
 				m.v.AddrEncounterList,
 				i,
 				structEncounterPtrs,
-				index+3,
+				0, 1,
 			)
-			return decPtr(b)
+			if b[0] == 0xFF && b[1] == 0xFF {
+				break
+			} else if int(b[0]) == m.BankIndex() && int(b[1]) == m.Index() {
+				b := readStruct(
+					m.v.ROM,
+					m.v.AddrEncounterList,
+					i,
+					structEncounterPtrs,
+					index+3,
+				)
+				ptrs[i] = decPtr(b)
+				break
+			}
 		}
-	}
-	return 0
-}
-
-func (m Map) Encounters() []pkm.EncounterList {
-	ptrs := [4]uint32{}
-	for i := 0; i < len(ptrs); i++ {
-		ptrs[i] = m.getEncounterPtr(i)
 	}
 	return []pkm.EncounterList{
 		EncounterGrass{v: m.v, p: ptrs[0]},
@@ -170,23 +166,6 @@ func (m Map) Encounters() []pkm.EncounterList {
 		EncounterRock{v: m.v, p: ptrs[2]},
 		EncounterRod{v: m.v, p: ptrs[3]},
 	}
-}
-
-func (m Map) EncountersByIndex(index int) (e pkm.EncounterList) {
-	if index < 0 || index >= 4 {
-		panic("encounter type index out of bounds")
-	}
-	switch index {
-	case 0:
-		e = EncounterGrass{v: m.v, p: m.getEncounterPtr(index)}
-	case 1:
-		e = EncounterWater{v: m.v, p: m.getEncounterPtr(index)}
-	case 2:
-		e = EncounterRock{v: m.v, p: m.getEncounterPtr(index)}
-	case 3:
-		e = EncounterRod{v: m.v, p: m.getEncounterPtr(index)}
-	}
-	return e
 }
 
 func (m Map) Name() string {
