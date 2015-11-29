@@ -138,7 +138,8 @@ type Version interface {
 	AllMaps() []Map
 	// Returns a map from any bank, by its name. The name is case-insensitive,
 	// and uses the default codec. Returns nil if no map was found. Panics if
-	// ScanBanks has not been called.
+	// ScanBanks has not been called. Note that multiple maps may share the
+	// same name, in which case the first map of the given name is returned.
 	MapByName(name string) Map
 }
 
@@ -604,7 +605,9 @@ type Bank interface {
 	// Returns a map by its index. Panics if the index exceeds MapIndexSize.
 	MapByIndex(index int) Map
 	// Returns a map by its name. The name is case-insensitive, and uses the
-	// default codec. Returns nil if no map was found.
+	// default codec. Returns nil if no map was found. Note that multiple maps
+	// may share the same name, in which case the first map of the given name
+	// is returned.
 	MapByName(name string) Map
 }
 
