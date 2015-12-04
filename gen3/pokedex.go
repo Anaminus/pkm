@@ -48,7 +48,7 @@ func (p Pokedex) Species(number int) pkm.Species {
 func (p Pokedex) AllSpecies() []pkm.Species {
 	a := make([]pkm.Species, p.Size())
 	p.v.ROM.Seek(p.v.pokedex[p.i].Address.ROM(), 0)
-	for i, q := 1, make([]byte, 2); i < p.Size(); i++ {
+	for i, q := 1, make([]byte, 2); i < indexSizeSpecies; i++ {
 		p.v.ROM.Read(q)
 		if n := int(decUint16(q)); n <= p.Size() {
 			a[n-1] = Species{v: p.v, i: i}
