@@ -102,7 +102,7 @@ func (s Species) Description() string {
 	b := readStruct(
 		s.v.ROM,
 		s.v.AddrPokedexData,
-		s.i,
+		s.v.Pokedex()[0].SpeciesNumber(s),
 		structDexData,
 		3,
 	)
@@ -114,7 +114,7 @@ func (s Species) Category() string {
 	b := readStruct(
 		s.v.ROM,
 		s.v.AddrPokedexData,
-		s.i,
+		s.v.Pokedex()[0].SpeciesNumber(s),
 		structDexData,
 		0,
 	)
@@ -125,7 +125,7 @@ func (s Species) Height() pkm.Height {
 	b := readStruct(
 		s.v.ROM,
 		s.v.AddrPokedexData,
-		s.i,
+		s.v.Pokedex()[0].SpeciesNumber(s),
 		structDexData,
 		1,
 	)
@@ -136,9 +136,9 @@ func (s Species) Weight() pkm.Weight {
 	b := readStruct(
 		s.v.ROM,
 		s.v.AddrPokedexData,
-		s.i,
+		s.v.Pokedex()[0].SpeciesNumber(s),
 		structDexData,
-		1,
+		2,
 	)
 	return pkm.Weight(decUint16(b))
 }
