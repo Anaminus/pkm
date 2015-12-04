@@ -225,7 +225,7 @@ func TestEncounters(t *testing.T) {
 	name := [4]string{"Grass", "Water", "Rock", "Rod"}
 	size := [4]int{12, 5, 5, 10}
 	erate := [4]byte{10, 4, 20, 30}
-	srate := [4]float32{0.2, 0.6, 0.6, 0.7}
+	srate := [4]float64{0.2, 0.6, 0.6, 0.7}
 	for i, e := range e {
 		if v := e.Name(); v != name[i] {
 			t.Errorf("EncounterList.Name: %d: unexpected result \"%s\"", i, v)

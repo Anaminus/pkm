@@ -240,7 +240,7 @@ func (e Encounter) Species() pkm.Species {
 
 ////////////////////////////////////////////////////////////////
 
-func encounterRate(v *Version, p ptr) float32 {
+func encounterRate(v *Version, p ptr) float64 {
 	if !p.ValidROM() {
 		return 0
 	}
@@ -251,7 +251,7 @@ func encounterRate(v *Version, p ptr) float32 {
 		structEncounterHeader,
 		0,
 	)
-	return float32(b[0]) / 255
+	return float64(b[0]) / 255
 }
 
 func encounters(v *Version, p ptr, s int) []pkm.Encounter {
@@ -309,7 +309,7 @@ func (e EncounterGrass) EncounterIndexSize() int {
 	return 12
 }
 
-func (e EncounterGrass) EncounterRate() float32 {
+func (e EncounterGrass) EncounterRate() float64 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -321,7 +321,7 @@ func (e EncounterGrass) Encounter(index int) pkm.Encounter {
 	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
 }
 
-func (e EncounterGrass) SpeciesRate(index int) (rate float32) {
+func (e EncounterGrass) SpeciesRate(index int) (rate float64) {
 	if index < 0 || index >= e.EncounterIndexSize() {
 		panic("species rate index out of bounds")
 	}
@@ -359,7 +359,7 @@ func (e EncounterWater) EncounterIndexSize() int {
 	return 5
 }
 
-func (e EncounterWater) EncounterRate() float32 {
+func (e EncounterWater) EncounterRate() float64 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -371,7 +371,7 @@ func (e EncounterWater) Encounter(index int) pkm.Encounter {
 	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
 }
 
-func (e EncounterWater) SpeciesRate(index int) (rate float32) {
+func (e EncounterWater) SpeciesRate(index int) (rate float64) {
 	if index < 0 || index >= e.EncounterIndexSize() {
 		panic("species rate index out of bounds")
 	}
@@ -409,7 +409,7 @@ func (e EncounterRock) EncounterIndexSize() int {
 	return 5
 }
 
-func (e EncounterRock) EncounterRate() float32 {
+func (e EncounterRock) EncounterRate() float64 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -421,7 +421,7 @@ func (e EncounterRock) Encounter(index int) pkm.Encounter {
 	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
 }
 
-func (e EncounterRock) SpeciesRate(index int) (rate float32) {
+func (e EncounterRock) SpeciesRate(index int) (rate float64) {
 	if index < 0 || index >= e.EncounterIndexSize() {
 		panic("species rate index out of bounds")
 	}
@@ -459,7 +459,7 @@ func (e EncounterRod) EncounterIndexSize() int {
 	return 10
 }
 
-func (e EncounterRod) EncounterRate() float32 {
+func (e EncounterRod) EncounterRate() float64 {
 	return encounterRate(e.v, e.p)
 }
 
@@ -471,7 +471,7 @@ func (e EncounterRod) Encounter(index int) pkm.Encounter {
 	return encounter(e.v, e.p, e.EncounterIndexSize(), index)
 }
 
-func (e EncounterRod) SpeciesRate(index int) (rate float32) {
+func (e EncounterRod) SpeciesRate(index int) (rate float64) {
 	if index < 0 || index >= e.EncounterIndexSize() {
 		panic("species rate index out of bounds")
 	}

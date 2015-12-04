@@ -458,29 +458,29 @@ type LevelMove struct {
 
 type Height uint16
 
-func (h Height) Centimeters() float32 {
+func (h Height) Centimeters() float64 {
 	return h.Meters() * 100
 }
 
-func (h Height) Meters() float32 {
-	return float32(h) / 10
+func (h Height) Meters() float64 {
+	return float64(h) / 10
 }
 
-func (h Height) Feet() float32 {
+func (h Height) Feet() float64 {
 	return h.Meters() / 0.3048
 }
 
-func (h Height) Inches() float32 {
+func (h Height) Inches() float64 {
 	return h.Feet() * 12
 }
 
 type Weight uint16
 
-func (w Weight) Kilograms() float32 {
-	return float32(w) / 10
+func (w Weight) Kilograms() float64 {
+	return float64(w) / 10
 }
 
-func (w Weight) Pounds() float32 {
+func (w Weight) Pounds() float64 {
 	return w.Kilograms() / 0.45359237
 }
 
@@ -637,7 +637,7 @@ type EncounterList interface {
 	Populated() bool
 	// Returns the probability (0-1) that traversing a block in the area will
 	// lead to an encounter. Returns 0 if the area is unpopulated.
-	EncounterRate() float32
+	EncounterRate() float64
 	// Returns the maximum size of the encounter table.
 	EncounterIndexSize() int
 	// Returns a list of possible species encounters. Returns nil if the area
@@ -648,7 +648,7 @@ type EncounterList interface {
 	Encounter(index int) Encounter
 	// Returns the probability (0-1) that the species encounter at the given
 	// index will be selected.
-	SpeciesRate(index int) float32
+	SpeciesRate(index int) float64
 }
 
 // Encounter contains information about a single encounter.
