@@ -459,29 +459,29 @@ type LevelMove struct {
 type Height uint16
 
 func (h Height) Centimeters() float32 {
-	return h.Meters() / 100
+	return h.Meters() * 100
 }
 
 func (h Height) Meters() float32 {
-	return float32(h) * 10
+	return float32(h) / 10
 }
 
 func (h Height) Feet() float32 {
-	return h.Meters() * 0.3048
+	return h.Meters() / 0.3048
 }
 
 func (h Height) Inches() float32 {
-	return h.Feet() / 12
+	return h.Feet() * 12
 }
 
 type Weight uint16
 
 func (w Weight) Kilograms() float32 {
-	return float32(w) * 10
+	return float32(w) / 10
 }
 
 func (w Weight) Pounds() float32 {
-	return w.Kilograms() * 0.45359237
+	return w.Kilograms() / 0.45359237
 }
 
 ////////////////////////////////////////////////////////////////
