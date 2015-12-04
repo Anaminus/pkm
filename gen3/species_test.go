@@ -28,7 +28,7 @@ func TestSpecies(t *testing.T) {
 	if v := species.Height(); v != 7 {
 		t.Errorf("Height: unexpected result %d", v)
 	}
-	if v := species.Weight(); v != 7 {
+	if v := species.Weight(); v != 69 {
 		t.Errorf("Weight: unexpected result %d", v)
 	}
 	if v := species.BaseStats(); v != (pkm.Stats{45, 49, 49, 45, 65, 65}) {
