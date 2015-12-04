@@ -263,6 +263,10 @@ func validMapHeader(rom io.ReadSeeker, p ptr) bool {
 }
 
 func (v *Version) ScanBanks() {
+	if len(v.sizeMapTable) > 0 {
+		return
+	}
+
 	ps := structPtr.Size()
 
 	// Find size of bank pointer table.
