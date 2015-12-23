@@ -658,7 +658,7 @@ type Map interface {
 	BankIndex() int
 	// Returns the index of the map.
 	Index() int
-	// Returns
+	// Returns the name of the map.
 	Name() string
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
