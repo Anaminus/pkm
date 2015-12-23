@@ -235,10 +235,10 @@ func (m Map) readTileset(ts *_tileset, p ptr, off int) {
 	// GBA has room for 16 palettes in RAM. Tilesets each point to a set of 16
 	// palettes in ROM.
 	//
-	// There are two tilesets per map. Only a portion of each of a tileset's
+	// Since there are two tilesets per map, only a portion of a tileset's
 	// palettes in ROM are read into RAM. A tileset's `primary` byte appears
-	// to determine which palettes in ROM are selected. 0 selects palettes
-	// 0-5, while 1 selects 6-11.
+	// to determine which palettes are selected. 0 selects palettes 0-5, while
+	// 1 selects 6-11.
 	//
 	// The selected palettes of the global tileset are set to palettes 0-5 in
 	// RAM. The selected palettes of the local tileset are set to palettes
