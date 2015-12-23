@@ -663,6 +663,9 @@ type Map interface {
 	Name() string
 	// Render the map as an image. Returns an image for each layer in the map.
 	Image() []*image.NRGBA
+	// Render the map border as an image. Returns an image for each layer in
+	// the map.
+	BorderImage() []*image.NRGBA
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
 	Encounters() []EncounterList

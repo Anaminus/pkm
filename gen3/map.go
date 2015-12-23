@@ -183,6 +183,42 @@ func (m Map) Image() []*image.NRGBA {
 	}
 }
 
+func (m Map) BorderImage() []*image.NRGBA {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+		2, 4, 5, 6, 7,
+	)
+
+	ts := &_tileset{}
+	m.readTileset(ts, decPtr(b[4:8]), 0)
+	m.readTileset(ts, decPtr(b[8:12]), 1)
+
+	var width, height int
+	if gc := m.v.GameCode(); gc == CodeFireRedEN || gc == CodeLeafGreenEN {
+		width, height = int(b[12]), int(b[13])
+	} else {
+		width, height = 2, 2
+	}
+	l := make(_layout, width*height*2)
+	m.v.ROM.Seek(decPtr(b[0:4]).ROM(), 0)
+	m.v.ROM.Read(l)
+
+	return []*image.NRGBA{
+		drawImage(width, height, l, ts, 0),
+		drawImage(width, height, l, ts, 1),
+	}
+}
+
 // Create an image from a tileset and layout.
 func drawImage(w, h int, l _layout, ts *_tileset, layer int) *image.NRGBA {
 	img := image.NewNRGBA(image.Rect(0, 0, w*16, h*16))
