@@ -131,6 +131,24 @@ func (m Map) Index() int {
 	return m.i
 }
 
+// Get pointer to map header.
+func (m Map) headerPtr() ptr {
+	m.v.ROM.Seek(m.v.AddrBanksPtr.ROM(), 0)
+	b := readStruct(
+		m.v.ROM,
+		readPtr(m.v.ROM),
+		m.b,
+		structPtr,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		m.i,
+		structPtr,
+	)
+	return decPtr(b)
+}
+
 func (m Map) Encounters() []pkm.EncounterList {
 	ptrs := [4]ptr{}
 	for p := 0; p < len(ptrs); p++ {
@@ -166,22 +184,9 @@ func (m Map) Encounters() []pkm.EncounterList {
 }
 
 func (m Map) Name() string {
-	m.v.ROM.Seek(m.v.AddrBanksPtr.ROM(), 0)
 	b := readStruct(
 		m.v.ROM,
-		readPtr(m.v.ROM),
-		m.b,
-		structPtr,
-	)
-	b = readStruct(
-		m.v.ROM,
-		decPtr(b),
-		m.i,
-		structPtr,
-	)
-	b = readStruct(
-		m.v.ROM,
-		decPtr(b),
+		m.headerPtr(),
 		0,
 		structMapHeader,
 		6,
