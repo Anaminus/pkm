@@ -164,16 +164,17 @@ func (m Map) Image() []*image.NRGBA {
 		decPtr(b),
 		0,
 		structMapLayoutData,
+		0, 1, 3, 4, 5,
 	)
 
 	ts := &_tileset{}
-	m.readTileset(ts, decPtr(b[16:20]), 0)
-	m.readTileset(ts, decPtr(b[20:24]), 1)
+	m.readTileset(ts, decPtr(b[12:16]), 0)
+	m.readTileset(ts, decPtr(b[16:20]), 1)
 
 	width := int(decUint32(b[0:4]))
 	height := int(decUint32(b[4:8]))
 	l := make(_layout, width*height*2)
-	m.v.ROM.Seek(decPtr(b[12:16]).ROM(), 0)
+	m.v.ROM.Seek(decPtr(b[8:12]).ROM(), 0)
 	m.v.ROM.Read(l)
 
 	return []*image.NRGBA{
