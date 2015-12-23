@@ -31,18 +31,17 @@ var (
 	structMapLayoutData = makeStruct(
 		4, // 0 Width
 		4, // 1 Height
-		4, // 2 Border
-		4, // 3 Map data / Tile structure
-		4, // 4 Global tileset
-		4, // 5 Local tileset
+		4, // 2 Pointer to border
+		4, // 3 Pointer to tile structure
+		4, // 4 Pointer to global tileset
+		4, // 5 Pointer to local tileset
 		1, // 6 Border width
 		1, // 7 Border height
 	)
 	structTilesetHeader = makeStruct(
 		1, // 0 Compressed
 		1, // 1 Is primary
-		1, // 2 Unknown
-		1, // 3 Unknown
+		2, // 2 Padding
 		4, // 4 Pointer to tileset image
 		4, // 5 Pointer to color palettes
 		4, // 6 Pointer to blocks
