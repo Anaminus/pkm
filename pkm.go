@@ -331,6 +331,24 @@ func (ep EffortPoints) Total() byte {
 // gender, or genderless.
 type GenderRatio byte
 
+func (g GenderRatio) Male() float64 {
+	if g == 255 {
+		return 0
+	}
+	return 1 - float64(g)/254
+}
+
+func (g GenderRatio) Female() float64 {
+	if g == 255 {
+		return 0
+	}
+	return float64(g) / 254
+}
+
+func (g GenderRatio) Genderless() bool {
+	return g == 255
+}
+
 func (g GenderRatio) String() string {
 	switch g {
 	case 255:
