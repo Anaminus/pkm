@@ -666,6 +666,15 @@ type Map interface {
 	// Render the map border as an image. Returns an image for each layer in
 	// the map.
 	BorderImage() []*image.NRGBA
+	// Render the tilesets used to draw the map. Maps have a global and a
+	// local tileset, which are returned separately. Returns an Image for each
+	// layer in the map.
+	//
+	// The width determines how wide the image will be, in blocks (each being
+	// 16x16 pixels), wrapping blocks that exceed the width to the next row. A
+	// width < 1 will make the image as wide as the number of blocks in the
+	// tileset.
+	Tilesets(width int) (global, local []*image.NRGBA)
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
 	Encounters() []EncounterList

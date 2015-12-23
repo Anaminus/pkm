@@ -1,6 +1,7 @@
 package gen3
 
 import (
+	"encoding/binary"
 	"github.com/anaminus/pkm"
 	"image"
 	"image/color"
@@ -217,6 +218,52 @@ func (m Map) BorderImage() []*image.NRGBA {
 		drawImage(width, height, l, ts, 0),
 		drawImage(width, height, l, ts, 1),
 	}
+}
+
+func (m Map) Tilesets(width int) (global, local []*image.NRGBA) {
+	if width < 1 {
+		width = 0x200
+	}
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+		4, 5,
+	)
+
+	ts := &_tileset{}
+	m.readTileset(ts, decPtr(b[0:4]), 0)
+	m.readTileset(ts, decPtr(b[4:8]), 1)
+
+	height := 0x200 / width
+	if 0x200%width != 0 {
+		height++
+	}
+
+	gl := make(_layout, width*height*2)
+	ll := make(_layout, width*height*2)
+	for i := 0; i < 0x200; i++ {
+		binary.LittleEndian.PutUint16([]byte(gl)[i*2:], uint16(i))
+		binary.LittleEndian.PutUint16([]byte(ll)[i*2:], uint16(i+0x200))
+	}
+
+	global = []*image.NRGBA{
+		drawImage(width, height, gl, ts, 0),
+		drawImage(width, height, gl, ts, 1),
+	}
+	local = []*image.NRGBA{
+		drawImage(width, height, ll, ts, 0),
+		drawImage(width, height, ll, ts, 1),
+	}
+	return
 }
 
 // Create an image from a tileset and layout.
