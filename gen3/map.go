@@ -232,25 +232,25 @@ func (m Map) readTileset(ts *_tileset, p ptr, off int) {
 	}
 	// Palette
 	//
-	// GBA has room for 16 palettes in memory. Tilesets each point to a set of
-	// 16 palettes.
+	// GBA has room for 16 palettes in RAM. Tilesets each point to a set of 16
+	// palettes in ROM.
 	//
 	// There are two tilesets per map. Only a portion of each of a tileset's
-	// palettes are read into memory. A tileset's `primary` byte appears to
-	// determine which palettes are selected. 0 selects palettes 0-5, while 1
-	// selects 6-11.
+	// palettes in ROM are read into RAM. A tileset's `primary` byte appears
+	// to determine which palettes in ROM are selected. 0 selects palettes
+	// 0-5, while 1 selects 6-11.
 	//
 	// The selected palettes of the global tileset are set to palettes 0-5 in
-	// memory. The selected palettes of the local tileset are set to palettes
-	// 6-11 in memory.
+	// RAM. The selected palettes of the local tileset are set to palettes
+	// 6-11 in RAM.
 	//
-	// Tileset palettes 12-15 appear to be unused by tilesets, but nonetheless
+	// Palettes 12-15 in ROM appear to be unused by tilesets, but nonetheless
 	// contain data (12 might be used, but I have not yet seen evidence). In
-	// memory, these palettes are likely reserved for other purposes.
+	// RAM, these palettes are likely reserved for other purposes.
 	//
-	// Color 0 in a given palette is always transparent, regardless of color.
-	// Color 0 of palette 0 in memory is used as the backdrop color; it is
-	// drawn when no opaque colors have been drawn to a pixel.
+	// Color 0 in a given palette is always drawn as transparent, regardless
+	// of color. Color 0 of palette 0 in RAM is used as the backdrop color; it
+	// is drawn when no opaque colors have been drawn to a pixel.
 	{
 		const size = 32 * 6
 		m.v.ROM.Seek(decPtr(header[8:12]).ROM()+32*6*int64(header[1]), 0)
