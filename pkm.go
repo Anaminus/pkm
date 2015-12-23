@@ -299,6 +299,15 @@ type Stats struct {
 	SpDefense byte
 }
 
+func (s Stats) Total() int {
+	return int(s.HitPoints) +
+		int(s.Attack) +
+		int(s.SpAttack) +
+		int(s.Defense) +
+		int(s.SpDefense) +
+		int(s.Speed)
+}
+
 // EffortPoints is the number of effort points a wild pokemon yields when
 // defeated.
 type EffortPoints uint16
@@ -309,6 +318,14 @@ func (ep EffortPoints) Defense() byte   { return byte(ep & 48 >> 4) }
 func (ep EffortPoints) Speed() byte     { return byte(ep & 192 >> 6) }
 func (ep EffortPoints) SpAttack() byte  { return byte(ep & 768 >> 8) }
 func (ep EffortPoints) SpDefense() byte { return byte(ep & 3072 >> 10) }
+func (ep EffortPoints) Total() byte {
+	return ep.Hitpoints() +
+		ep.Attack() +
+		ep.Defense() +
+		ep.Speed() +
+		ep.SpAttack() +
+		ep.SpDefense()
+}
 
 // GenderRatio indicates the chance that a wild pokemon will be of a certain
 // gender, or genderless.
