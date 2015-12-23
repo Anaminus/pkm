@@ -51,6 +51,7 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrSpeciesEvo:     0xFFFFFFFF,
 		AddrSpeciesName:    0xFFFFFFFF,
 		AddrSpeciesTM:      0xFFFFFFFF,
+		AddrTypeEffect:     0xFFFFFFFF,
 		AddrTMMove:         0xFFFFFFFF,
 	},
 	CodeSapphireEN: Version{
@@ -74,6 +75,7 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrSpeciesEvo:     0xFFFFFFFF,
 		AddrSpeciesName:    0xFFFFFFFF,
 		AddrSpeciesTM:      0xFFFFFFFF,
+		AddrTypeEffect:     0xFFFFFFFF,
 		AddrTMMove:         0xFFFFFFFF,
 	},
 	CodeEmeraldEN: Version{
@@ -97,6 +99,7 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrSpeciesEvo:     0x0832531C,
 		AddrSpeciesName:    0x083185C8,
 		AddrSpeciesTM:      0x0831E898,
+		AddrTypeEffect:     0x0831ACE8,
 		AddrTMMove:         0x08616040,
 	},
 	CodeFireRedEN: Version{
@@ -120,6 +123,7 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrSpeciesEvo:     0xFFFFFFFF,
 		AddrSpeciesName:    0xFFFFFFFF,
 		AddrSpeciesTM:      0xFFFFFFFF,
+		AddrTypeEffect:     0xFFFFFFFF,
 		AddrTMMove:         0xFFFFFFFF,
 	},
 	CodeLeafGreenEN: Version{
@@ -143,6 +147,7 @@ var versionLookup = map[pkm.GameCode]Version{
 		AddrSpeciesEvo:     0xFFFFFFFF,
 		AddrSpeciesName:    0xFFFFFFFF,
 		AddrSpeciesTM:      0xFFFFFFFF,
+		AddrTypeEffect:     0xFFFFFFFF,
 		AddrTMMove:         0xFFFFFFFF,
 	},
 }

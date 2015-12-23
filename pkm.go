@@ -141,6 +141,11 @@ type Version interface {
 	// ScanBanks has not been called. Note that multiple maps may share the
 	// same name, in which case the first map of the given name is returned.
 	MapByName(name string) Map
+
+	// TypeEffectiveness calculates the effectiveness of an attack of a given
+	// type versus the types of a defending pokemon. If boths types of the
+	// defender are the same, then they are counted as a single type.
+	TypeEffectiveness(atk Type, def [2]Type) float64
 }
 
 ////////////////////////////////////////////////////////////////

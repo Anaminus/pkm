@@ -10,6 +10,14 @@ import (
 
 ////////////////////////////////////////////////////////////////
 
+var (
+	structTypeEffect = makeStruct(
+		1, // 0 Attack type
+		1, // 1 Defend type
+		1, // 2 Effect
+	)
+)
+
 type Version struct {
 	ROM                io.ReadSeeker
 	name               string
@@ -30,6 +38,7 @@ type Version struct {
 	AddrSpeciesEvo     ptr // Table of species evolution data.
 	AddrSpeciesName    ptr // Table of species names.
 	AddrSpeciesTM      ptr // Table of species TM compatibility.
+	AddrTypeEffect     ptr // List of type effectiveness.
 	AddrTMMove         ptr // Table of TM move mappings.
 }
 
@@ -375,4 +384,25 @@ func (v *Version) MapByName(name string) pkm.Map {
 		}
 	}
 	return nil
+}
+
+func (v *Version) TypeEffectiveness(atk pkm.Type, def [2]pkm.Type) float64 {
+	v.ROM.Seek(v.AddrTypeEffect.ROM(), 0)
+	var mult byte = 4
+	for q := make([]byte, structTypeEffect.Size()); ; {
+		v.ROM.Read(q)
+		if a, d := pkm.Type(q[0]), pkm.Type(q[1]); a == 0xFF || d == 0xFF {
+			break
+		} else if a == atk && (d == def[0] || d == def[1]) {
+			switch q[2] {
+			case 0:
+				mult = 0
+			case 5:
+				mult >>= 1
+			case 20:
+				mult <<= 1
+			}
+		}
+	}
+	return float64(mult) / 4
 }
