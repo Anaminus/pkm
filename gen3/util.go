@@ -65,6 +65,43 @@ func decUint64(b []byte) uint64 {
 	return binary.LittleEndian.Uint64(b)
 }
 
+func readLZ77(r io.Reader) ([]byte, bool) {
+	q := make([]byte, 4)
+	r.Read(q[:1])
+	if q[0] != 0x10 {
+		return nil, false
+	}
+	r.Read(q[:3])
+	q[3] = 0
+	size := int(binary.LittleEndian.Uint32(q))
+	output := make([]byte, size)
+	p := 0
+	for p < size {
+		r.Read(q[:1])
+		flags := q[0]
+		for i := 0; i < 8; i++ {
+			if flags&(0x80>>uint(i)) == 0 {
+				r.Read(q[:1])
+				output[p] = q[0]
+				p++
+			} else {
+				r.Read(q[:2])
+				b := binary.LittleEndian.Uint16(q[:2])
+				c := int(((b >> 4) & 0xF) + 3)
+				n := p - int(((b&0xF)<<8)|((b>>8)&0xFF)) - 1
+				for i := 0; i < c; i++ {
+					output[p+i] = output[n+i]
+				}
+				p += c
+			}
+			if p >= size {
+				break
+			}
+		}
+	}
+	return output, true
+}
+
 ////////////////////////////////////////////////////////////////
 
 type ptr uint32
