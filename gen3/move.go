@@ -89,6 +89,17 @@ func (m Move) Accuracy() byte {
 	return b[0]
 }
 
+func (m Move) PowerPoints() byte {
+	b := readStruct(
+		m.v.ROM,
+		m.v.AddrMoveData,
+		m.i,
+		structMoveData,
+		4,
+	)
+	return b[0]
+}
+
 func (m Move) Effect() pkm.Effect {
 	b := readStruct(
 		m.v.ROM,

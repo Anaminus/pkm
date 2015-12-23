@@ -535,6 +535,7 @@ type Move interface {
 	Type() Type
 	BasePower() byte
 	Accuracy() byte
+	PowerPoints() byte
 	Effect() Effect
 	EffectAccuracy() byte
 	Affectee() Affectee
