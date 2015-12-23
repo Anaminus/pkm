@@ -2,6 +2,8 @@ package gen3
 
 import (
 	"github.com/anaminus/pkm"
+	"image"
+	"image/color"
 	"strings"
 )
 
@@ -148,6 +150,248 @@ func (m Map) headerPtr() ptr {
 	)
 	return decPtr(b)
 }
+
+func (m Map) Image() []*image.NRGBA {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+	)
+
+	ts := &_tileset{}
+	m.readTileset(ts, decPtr(b[16:20]), 0)
+	m.readTileset(ts, decPtr(b[20:24]), 1)
+
+	width := int(decUint32(b[0:4]))
+	height := int(decUint32(b[4:8]))
+	l := make(_layout, width*height*2)
+	m.v.ROM.Seek(decPtr(b[12:16]).ROM(), 0)
+	m.v.ROM.Read(l)
+
+	return []*image.NRGBA{
+		drawImage(width, height, l, ts, 0),
+		drawImage(width, height, l, ts, 1),
+	}
+}
+
+// Create an image from a tileset and layout.
+func drawImage(w, h int, l _layout, ts *_tileset, layer int) *image.NRGBA {
+	img := image.NewNRGBA(image.Rect(0, 0, w*16, h*16))
+	for i := 0; i < w*h; i++ {
+		cx, cy := i%w, i/w
+		bi, _ := l.Cell(i)
+		block := ts.Block(bi)
+		for j := 0; j < 4; j++ {
+			sx, sy := j%2, j/2
+			block.Tile(j, layer).DrawTo(ts, img, cx*16+sx*8, cy*16+sy*8)
+		}
+	}
+	return img
+}
+
+// Reads a single tileset from ROM into a given tileset.
+//
+// Tilesets come in pairs. When read into memory, each component of the
+// tilesets are combined. That is, the global block list is read into the
+// first half of the block address space, while the local block list is read
+// into the second half. The same occurs with images and palettes.
+func (m Map) readTileset(ts *_tileset, p ptr, off int) {
+	header := readStruct(
+		m.v.ROM,
+		p,
+		0,
+		structTilesetHeader,
+	)
+	// Tileset image
+	//
+	// An image is a sequence of 8x8 sprites, to which tileset blocks refer to
+	// create full 16x16 blocks. An image is usually compressed.
+	//
+	// The image from the global tileset is read into the first half of the
+	// image address space, while the local image is read into the second
+	// half.
+	{
+		const size = len(ts.image) / 2
+		m.v.ROM.Seek(decPtr(header[4:8]).ROM(), 0)
+		if header[0] == 1 {
+			b, ok := readLZ77(m.v.ROM)
+			if ok {
+				copy(ts.image[off*size:], b)
+			}
+		} else {
+			m.v.ROM.Read(ts.image[off*size : off*size+size])
+		}
+	}
+	// Palette
+	//
+	// GBA has room for 16 palettes in memory. Tilesets each point to a set of
+	// 16 palettes.
+	//
+	// There are two tilesets per map. Only a portion of each of a tileset's
+	// palettes are read into memory. A tileset's `primary` byte appears to
+	// determine which palettes are selected. 0 selects palettes 0-5, while 1
+	// selects 6-11.
+	//
+	// The selected palettes of the global tileset are set to palettes 0-5 in
+	// memory. The selected palettes of the local tileset are set to palettes
+	// 6-11 in memory.
+	//
+	// Tileset palettes 12-15 appear to be unused by tilesets, but nonetheless
+	// contain data (12 might be used, but I have not yet seen evidence). In
+	// memory, these palettes are likely reserved for other purposes.
+	//
+	// Color 0 in a given palette is always transparent, regardless of color.
+	// Color 0 of palette 0 in memory is used as the backdrop color; it is
+	// drawn when no opaque colors have been drawn to a pixel.
+	{
+		const size = 32 * 6
+		m.v.ROM.Seek(decPtr(header[8:12]).ROM()+32*6*int64(header[1]), 0)
+		m.v.ROM.Read(ts.pal[off*size : off*size+size])
+	}
+	// Blocks
+	{
+		const size = len(ts.blocks) / 2
+		m.v.ROM.Seek(decPtr(header[12:16]).ROM(), 0)
+		m.v.ROM.Read(ts.blocks[off*size : off*size+size])
+	}
+}
+
+// Tileset comprises a list of blocks, as well as an image and palette list.
+// The full set is created from a global and local tileset.
+type _tileset struct {
+	blocks [16384]byte
+	image  [32768]byte
+	pal    [512]byte
+}
+
+func (t _tileset) Block(i int) _block {
+	return _block(t.blocks[i*16 : i*16+16])
+}
+
+func (t _tileset) Sprite(i int) _sprite {
+	return _sprite(t.image[i*32 : i*32+32])
+}
+
+func (t _tileset) Palette(i int) _palette {
+	return t.pal[i*32 : i*32+32]
+}
+
+// Represents the layout of a map. The layout is a grid of cells. Each cell
+// consists of an index that points to a block in some tileset, as well as the
+// index of an attribute, which appears to be movement permissions.
+type _layout []byte
+
+func (l _layout) Cell(i int) (block, attr int) {
+	n := decUint16(l[i*2 : i*2+2])
+	block = int(n & 1023)
+	attr = int(n & 64512 >> 10)
+	return
+}
+
+// A block is made up of two layers, with each layer containing 4 tiles,
+// representing the four quadrants of the block.
+type _block []byte
+
+func (b _block) Tile(index, layer int) _tile {
+	return _tile(decUint16(b[index*2+8*layer:]))
+}
+
+// A tile contains a sprite index and a palette index, as well as whether the
+// sprite is flipped on each axis.
+type _tile uint16
+
+func (t _tile) SpriteIndex() int {
+	// 0000 0011 1111 1111
+	return int(t & 1023)
+}
+func (t _tile) FlipX() bool {
+	// 0000 0100 0000 0000
+	return t&1024 != 0
+}
+func (t _tile) FlipY() bool {
+	// 0000 1000 0000 0000
+	return t&2048 != 0
+}
+func (t _tile) PaletteIndex() int {
+	// 1111 0000 0000 0000
+	return int(t & 61440 >> 12)
+}
+
+// Draws the tile to an image, given a tileset and an offset.
+func (t _tile) DrawTo(ts *_tileset, img *image.NRGBA, ox, oy int) {
+	s := ts.Sprite(t.SpriteIndex())
+	p := ts.Palette(t.PaletteIndex())
+	for i := 0; i < 64; i++ {
+		x, y := i%8, i/8
+		if t.FlipX() {
+			x = 7 - x
+		}
+		if t.FlipY() {
+			y = 7 - y
+		}
+		ci := s.ColorIndex(i)
+		pc := p.Color(ci)
+		var c color.NRGBA
+		if ci == 0 {
+			c = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
+		} else {
+			c = color.NRGBA{R: pc.R(), G: pc.G(), B: pc.B(), A: 255}
+		}
+		img.SetNRGBA(ox+x, oy+y, c)
+	}
+}
+
+// A sprite is an 8x8 array of pixel data. Each value in the sprite is an
+// index that points to a color in a palette.
+type _sprite []byte
+
+func (s _sprite) ColorIndex(i int) int {
+	if i%2 == 0 {
+		return int(s[i/2] & 15)
+	} else {
+		return int(s[i/2] & 240 >> 4)
+	}
+}
+
+func (s _sprite) Len() int {
+	return len(s) * 2
+}
+
+// A palette contains 16 colors.
+type _palette []byte
+
+func (p _palette) Color(i int) _color {
+	return _color(decUint16(p[i*2 : i*2+2]))
+}
+
+// 15-bit color, with each channel occupying 5 bits, or 32 values per channel.
+// Values are in the range 0-248.
+type _color uint16
+
+func (c _color) R() byte {
+	b := c & 31
+	return byte(b * 8)
+}
+
+func (c _color) G() byte {
+	b := c & 992 >> 5
+	return byte(b * 8)
+}
+
+func (c _color) B() byte {
+	b := c & 31744 >> 10
+	return byte(b * 8)
+}
+
+////////////////////////////////////////////////////////////////
 
 func (m Map) Encounters() []pkm.EncounterList {
 	ptrs := [4]ptr{}
