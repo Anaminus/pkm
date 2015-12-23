@@ -266,6 +266,30 @@ func (m Map) Tilesets(width int) (global, local []*image.NRGBA) {
 	return
 }
 
+func (m Map) BackgroundColor() color.NRGBA {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+		4, 5,
+	)
+
+	// TODO: It isn't necessary to read the entire tileset.
+	ts := &_tileset{}
+	m.readTileset(ts, decPtr(b[0:4]), 0)
+	m.readTileset(ts, decPtr(b[4:8]), 1)
+	c := ts.Palette(0).Color(0)
+	return color.NRGBA{R: c.R(), G: c.G(), B: c.B(), A: 255}
+}
+
 // Create an image from a tileset and layout.
 func drawImage(w, h int, l _layout, ts *_tileset, layer int) *image.NRGBA {
 	img := image.NewNRGBA(image.Rect(0, 0, w*16, h*16))

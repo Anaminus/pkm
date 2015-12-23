@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"image/color"
 	"io"
 	"strings"
 )
@@ -675,6 +676,9 @@ type Map interface {
 	// width < 1 will make the image as wide as the number of blocks in the
 	// tileset.
 	Tilesets(width int) (global, local []*image.NRGBA)
+	// Returns the color that is drawn when no opaque colors have been drawn
+	// to a pixel.
+	BackgroundColor() color.NRGBA
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
 	Encounters() []EncounterList
