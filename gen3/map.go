@@ -294,9 +294,7 @@ func (m Map) TilesetImage(width int) []*image.NRGBA {
 
 func (m Map) BackgroundColor() color.NRGBA {
 	// TODO: It isn't necessary to read the entire tileset.
-	ts := m.Tileset()
-	c := ts.Palette(0).Color(0)
-	return color.NRGBA{R: c.R(), G: c.G(), B: c.B(), A: 255}
+	return m.Tileset().Palette(0).Color(0)
 }
 
 // Reads a single tileset from ROM into a given tileset.
