@@ -305,7 +305,7 @@ func (s Species) SafariRate() byte {
 	return b[0]
 }
 
-func (s Species) Color() pkm.Color {
+func (s Species) Color() pkm.SpeciesColor {
 	b := readStruct(
 		s.v.ROM,
 		s.v.AddrSpeciesData,
@@ -313,7 +313,7 @@ func (s Species) Color() pkm.Color {
 		structSpeciesData,
 		22,
 	)
-	return pkm.Color(b[0] & 127)
+	return pkm.SpeciesColor(b[0] & 127)
 }
 
 func (s Species) Flipped() bool {
