@@ -384,6 +384,18 @@ func (t _tileset) Palette(i int) pkm.Palette {
 	return _palette(t.pal[i*32 : i*32+32])
 }
 
+func (t _tileset) BlockLen() int {
+	return 1024
+}
+
+func (t _tileset) SpriteLen() int {
+	return 1024
+}
+
+func (t _tileset) PaletteLen() int {
+	return 16
+}
+
 // Represents the layout of a map. The layout is a grid of cells. Each cell
 // consists of an index that points to a block in some tileset, as well as the
 // index of an attribute, which appears to be movement permissions.

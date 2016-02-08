@@ -706,6 +706,10 @@ type Tileset interface {
 	Block(i int) Block
 	Sprite(i int) Sprite
 	Palette(i int) Palette
+
+	BlockLen() int
+	SpriteLen() int
+	PaletteLen() int
 }
 
 // A block is made up of two layers, with each layer containing 4 tiles,
