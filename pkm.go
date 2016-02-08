@@ -278,7 +278,7 @@ type Species interface {
 	// Zone.
 	SafariRate() byte
 	// The pokemon's color.
-	Color() Color
+	Color() SpeciesColor
 	// A list of moves that can be learned, at which levels, by a pokemon of
 	// this species.
 	LearnedMoves() []LevelMove
@@ -450,23 +450,23 @@ func (g EggGroup) String() string {
 	return "Unknown"
 }
 
-// Color indicates the color of a species.
-type Color byte
+// SpeciesColor indicates the color of a species.
+type SpeciesColor byte
 
 const (
-	ColorRed    Color = 0
-	ColorBlue         = 1
-	ColorYellow       = 2
-	ColorGreen        = 3
-	ColorBlack        = 4
-	ColorBrown        = 5
-	ColorPurple       = 6
-	ColorGray         = 7
-	ColorWhite        = 8
-	ColorPink         = 9
+	ColorRed    SpeciesColor = 0
+	ColorBlue                = 1
+	ColorYellow              = 2
+	ColorGreen               = 3
+	ColorBlack               = 4
+	ColorBrown               = 5
+	ColorPurple              = 6
+	ColorGray                = 7
+	ColorWhite               = 8
+	ColorPink                = 9
 )
 
-func (c Color) String() string {
+func (c SpeciesColor) String() string {
 	switch c {
 	case ColorRed:
 		return "Red"
