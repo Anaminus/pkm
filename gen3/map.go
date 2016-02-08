@@ -254,7 +254,7 @@ func (m Map) BorderImage() []*image.NRGBA {
 
 func (m Map) TilesetImage(width int) []*image.NRGBA {
 	if width < 1 {
-		width = 0x200
+		width = 0x400
 	}
 	b := readStruct(
 		m.v.ROM,
@@ -273,8 +273,8 @@ func (m Map) TilesetImage(width int) []*image.NRGBA {
 
 	ts := m.Tileset()
 
-	height := 0x200 / width
-	if 0x200%width != 0 {
+	height := 0x400 / width
+	if 0x400%width != 0 {
 		height++
 	}
 
