@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"io"
 	"strings"
 )
@@ -662,26 +663,144 @@ type Map interface {
 	Index() int
 	// Returns the name of the map.
 	Name() string
+	// Returns the cells that make up the map.
+	Layout() Layout
+	// Returns the cells that make up the border of the map.
+	Border() Layout
+	// Returns the tileset used to render the map.
+	Tileset() Tileset
 	// Render the map as an image. Returns an image for each layer in the map.
 	Image() []*image.NRGBA
 	// Render the map border as an image. Returns an image for each layer in
 	// the map.
 	BorderImage() []*image.NRGBA
-	// Render the tilesets used to draw the map. Maps have a global and a
-	// local tileset, which are returned separately. Returns an Image for each
+	// Render the tileset used to draw the map. Returns an Image for each
 	// layer in the map.
 	//
 	// The width determines how wide the image will be, in blocks (each being
 	// 16x16 pixels), wrapping blocks that exceed the width to the next row. A
 	// width < 1 will make the image as wide as the number of blocks in the
 	// tileset.
-	Tilesets(width int) (global, local []*image.NRGBA)
+	TilesetImage(width int) []*image.NRGBA
 	// Returns the color that is drawn when no opaque colors have been drawn
 	// to a pixel.
 	BackgroundColor() color.NRGBA
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
 	Encounters() []EncounterList
+}
+
+// Represents the layout of a map. The layout is a grid of cells. Each cell
+// consists of an index that points to a block in some tileset, as well as the
+// index of an attribute, which appears to be movement permissions.
+type Layout interface {
+	Width() int
+	Height() int
+	Cell(i int) (block, attr int)
+	CellAt(x, y int) (block, attr int)
+}
+
+// Tileset comprises a list of blocks, as well as an image and palette list.
+// The full set is created from a global and local tileset.
+type Tileset interface {
+	Block(i int) Block
+	Sprite(i int) Sprite
+	Palette(i int) Palette
+}
+
+// A block is made up of two layers, with each layer containing 4 tiles,
+// representing the four quadrants of the block.
+type Block interface {
+	Tile(index, layer int) Tile
+}
+
+// A tile contains a sprite index and a palette index, as well as whether the
+// sprite is flipped on each axis.
+type Tile uint16
+
+func (t Tile) SpriteIndex() int {
+	// 0000 0011 1111 1111
+	return int(t & 1023)
+}
+func (t Tile) FlipX() bool {
+	// 0000 0100 0000 0000
+	return t&1024 != 0
+}
+func (t Tile) FlipY() bool {
+	// 0000 1000 0000 0000
+	return t&2048 != 0
+}
+func (t Tile) PaletteIndex() int {
+	// 1111 0000 0000 0000
+	return int(t & 61440 >> 12)
+}
+
+// Draws the tile to an image, given a tileset and an offset.
+func (t Tile) DrawTo(ts Tileset, img *image.NRGBA, ox, oy int) {
+	s := ts.Sprite(t.SpriteIndex())
+	p := ts.Palette(t.PaletteIndex())
+	for i := 0; i < 64; i++ {
+		x, y := i%8, i/8
+		if t.FlipX() {
+			x = 7 - x
+		}
+		if t.FlipY() {
+			y = 7 - y
+		}
+		ci := s.ColorIndex(i)
+		var c color.NRGBA
+		if ci > 0 {
+			c = p.Color(ci)
+		}
+		img.SetNRGBA(ox+x, oy+y, c)
+	}
+}
+
+// A sprite is an 8x8 array of pixel data. Each value in the sprite is an
+// index that points to a color in a palette.
+type Sprite interface {
+	ColorIndex(i int) int
+	Len() int
+}
+
+// A palette contains 16 colors.
+type Palette interface {
+	Color(i int) Color
+}
+
+// Create an image from a tileset and layout.
+func DrawImage(l Layout, ts Tileset, layer int) *image.NRGBA {
+	w := l.Width()
+	h := l.Height()
+	img := image.NewNRGBA(image.Rect(0, 0, w*16, h*16))
+	for i := 0; i < w*h; i++ {
+		cx, cy := i%w, i/w
+		bi, _ := l.Cell(i)
+		block := ts.Block(bi)
+		for j := 0; j < 4; j++ {
+			sx, sy := j%2, j/2
+			block.Tile(j, layer).DrawTo(ts, img, cx*16+sx*8, cy*16+sy*8)
+		}
+	}
+	return img
+}
+
+func CombineLayers(layers ...*image.NRGBA) *image.NRGBA {
+	bounds := layers[0].Bounds()
+	for i := 1; i < len(layers); i++ {
+		bounds = bounds.Union(layers[i].Bounds())
+	}
+	final := image.NewNRGBA(bounds)
+	for _, layer := range layers {
+		draw.Draw(
+			final,
+			layer.Bounds(),
+			layer,
+			image.Pt(0, 0),
+			draw.Over,
+		)
+	}
+	return final
 }
 
 ////////////////////////////////////////////////////////////////

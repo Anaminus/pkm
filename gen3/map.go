@@ -152,7 +152,7 @@ func (m Map) headerPtr() ptr {
 	return decPtr(b)
 }
 
-func (m Map) Image() []*image.NRGBA {
+func (m Map) Layout() pkm.Layout {
 	b := readStruct(
 		m.v.ROM,
 		m.headerPtr(),
@@ -165,62 +165,94 @@ func (m Map) Image() []*image.NRGBA {
 		decPtr(b),
 		0,
 		structMapLayoutData,
-		0, 1, 3, 4, 5,
+		0, 1, 3,
 	)
-
-	ts := &_tileset{}
-	m.readTileset(ts, decPtr(b[12:16]), 0)
-	m.readTileset(ts, decPtr(b[16:20]), 1)
 
 	width := int(decUint32(b[0:4]))
 	height := int(decUint32(b[4:8]))
-	l := make(_layout, width*height*2)
+	l := _layout{
+		width:  width,
+		height: height,
+		cells:  make([]byte, width*height*2),
+	}
 	m.v.ROM.Seek(decPtr(b[8:12]).ROM(), 0)
-	m.v.ROM.Read(l)
+	m.v.ROM.Read(l.cells)
+	return l
+}
 
+func (m Map) Border() pkm.Layout {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+		2, 6, 7,
+	)
+
+	var width, height int
+	if gc := m.v.GameCode(); gc == CodeFireRedEN || gc == CodeLeafGreenEN {
+		width, height = int(b[4]), int(b[5])
+	} else {
+		width, height = 2, 2
+	}
+	l := _layout{
+		width:  width,
+		height: height,
+		cells:  make([]byte, width*height*2),
+	}
+	m.v.ROM.Seek(decPtr(b[0:4]).ROM(), 0)
+	m.v.ROM.Read(l.cells)
+	return l
+}
+
+func (m Map) Tileset() pkm.Tileset {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		0,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structMapLayoutData,
+		4, 5,
+	)
+
+	ts := &_tileset{}
+	m.readTileset(ts, decPtr(b[0:4]), 0)
+	m.readTileset(ts, decPtr(b[4:8]), 1)
+	return ts
+}
+
+func (m Map) Image() []*image.NRGBA {
+	ts := m.Tileset()
+	l := m.Layout()
 	return []*image.NRGBA{
-		drawImage(width, height, l, ts, 0),
-		drawImage(width, height, l, ts, 1),
+		pkm.DrawImage(l, ts, 0),
+		pkm.DrawImage(l, ts, 1),
 	}
 }
 
 func (m Map) BorderImage() []*image.NRGBA {
-	b := readStruct(
-		m.v.ROM,
-		m.headerPtr(),
-		0,
-		structMapHeader,
-		0,
-	)
-	b = readStruct(
-		m.v.ROM,
-		decPtr(b),
-		0,
-		structMapLayoutData,
-		2, 4, 5, 6, 7,
-	)
-
-	ts := &_tileset{}
-	m.readTileset(ts, decPtr(b[4:8]), 0)
-	m.readTileset(ts, decPtr(b[8:12]), 1)
-
-	var width, height int
-	if gc := m.v.GameCode(); gc == CodeFireRedEN || gc == CodeLeafGreenEN {
-		width, height = int(b[12]), int(b[13])
-	} else {
-		width, height = 2, 2
-	}
-	l := make(_layout, width*height*2)
-	m.v.ROM.Seek(decPtr(b[0:4]).ROM(), 0)
-	m.v.ROM.Read(l)
-
+	ts := m.Tileset()
+	l := m.Border()
 	return []*image.NRGBA{
-		drawImage(width, height, l, ts, 0),
-		drawImage(width, height, l, ts, 1),
+		pkm.DrawImage(l, ts, 0),
+		pkm.DrawImage(l, ts, 1),
 	}
 }
 
-func (m Map) Tilesets(width int) (global, local []*image.NRGBA) {
+func (m Map) TilesetImage(width int) []*image.NRGBA {
 	if width < 1 {
 		width = 0x200
 	}
@@ -239,70 +271,32 @@ func (m Map) Tilesets(width int) (global, local []*image.NRGBA) {
 		4, 5,
 	)
 
-	ts := &_tileset{}
-	m.readTileset(ts, decPtr(b[0:4]), 0)
-	m.readTileset(ts, decPtr(b[4:8]), 1)
+	ts := m.Tileset()
 
 	height := 0x200 / width
 	if 0x200%width != 0 {
 		height++
 	}
 
-	gl := make(_layout, width*height*2)
-	ll := make(_layout, width*height*2)
-	for i := 0; i < 0x200; i++ {
-		binary.LittleEndian.PutUint16([]byte(gl)[i*2:], uint16(i))
-		binary.LittleEndian.PutUint16([]byte(ll)[i*2:], uint16(i+0x200))
+	l := _layout{
+		width:  width,
+		height: height,
+		cells:  make([]byte, width*height*2),
 	}
-
-	global = []*image.NRGBA{
-		drawImage(width, height, gl, ts, 0),
-		drawImage(width, height, gl, ts, 1),
+	for i := 0; i < 0x400; i++ {
+		binary.LittleEndian.PutUint16(l.cells[i*2:], uint16(i))
 	}
-	local = []*image.NRGBA{
-		drawImage(width, height, ll, ts, 0),
-		drawImage(width, height, ll, ts, 1),
+	return []*image.NRGBA{
+		pkm.DrawImage(l, ts, 0),
+		pkm.DrawImage(l, ts, 1),
 	}
-	return
 }
 
 func (m Map) BackgroundColor() color.NRGBA {
-	b := readStruct(
-		m.v.ROM,
-		m.headerPtr(),
-		0,
-		structMapHeader,
-		0,
-	)
-	b = readStruct(
-		m.v.ROM,
-		decPtr(b),
-		0,
-		structMapLayoutData,
-		4, 5,
-	)
-
 	// TODO: It isn't necessary to read the entire tileset.
-	ts := &_tileset{}
-	m.readTileset(ts, decPtr(b[0:4]), 0)
-	m.readTileset(ts, decPtr(b[4:8]), 1)
+	ts := m.Tileset()
 	c := ts.Palette(0).Color(0)
 	return color.NRGBA{R: c.R(), G: c.G(), B: c.B(), A: 255}
-}
-
-// Create an image from a tileset and layout.
-func drawImage(w, h int, l _layout, ts *_tileset, layer int) *image.NRGBA {
-	img := image.NewNRGBA(image.Rect(0, 0, w*16, h*16))
-	for i := 0; i < w*h; i++ {
-		cx, cy := i%w, i/w
-		bi, _ := l.Cell(i)
-		block := ts.Block(bi)
-		for j := 0; j < 4; j++ {
-			sx, sy := j%2, j/2
-			block.Tile(j, layer).DrawTo(ts, img, cx*16+sx*8, cy*16+sy*8)
-		}
-	}
-	return img
 }
 
 // Reads a single tileset from ROM into a given tileset.
@@ -380,81 +374,52 @@ type _tileset struct {
 	pal    [512]byte
 }
 
-func (t _tileset) Block(i int) _block {
+func (t _tileset) Block(i int) pkm.Block {
 	return _block(t.blocks[i*16 : i*16+16])
 }
 
-func (t _tileset) Sprite(i int) _sprite {
+func (t _tileset) Sprite(i int) pkm.Sprite {
 	return _sprite(t.image[i*32 : i*32+32])
 }
 
-func (t _tileset) Palette(i int) _palette {
-	return t.pal[i*32 : i*32+32]
+func (t _tileset) Palette(i int) pkm.Palette {
+	return _palette(t.pal[i*32 : i*32+32])
 }
 
 // Represents the layout of a map. The layout is a grid of cells. Each cell
 // consists of an index that points to a block in some tileset, as well as the
 // index of an attribute, which appears to be movement permissions.
-type _layout []byte
+type _layout struct {
+	width  int
+	height int
+	cells  []byte
+}
+
+func (l _layout) Width() int {
+	return l.width
+}
+
+func (l _layout) Height() int {
+	return l.height
+}
 
 func (l _layout) Cell(i int) (block, attr int) {
-	n := decUint16(l[i*2 : i*2+2])
+	n := decUint16(l.cells[i*2 : i*2+2])
 	block = int(n & 1023)
 	attr = int(n & 64512 >> 10)
 	return
+}
+
+func (l _layout) CellAt(x, y int) (block, attr int) {
+	return l.Cell(y*l.width + x)
 }
 
 // A block is made up of two layers, with each layer containing 4 tiles,
 // representing the four quadrants of the block.
 type _block []byte
 
-func (b _block) Tile(index, layer int) _tile {
-	return _tile(decUint16(b[index*2+8*layer:]))
-}
-
-// A tile contains a sprite index and a palette index, as well as whether the
-// sprite is flipped on each axis.
-type _tile uint16
-
-func (t _tile) SpriteIndex() int {
-	// 0000 0011 1111 1111
-	return int(t & 1023)
-}
-func (t _tile) FlipX() bool {
-	// 0000 0100 0000 0000
-	return t&1024 != 0
-}
-func (t _tile) FlipY() bool {
-	// 0000 1000 0000 0000
-	return t&2048 != 0
-}
-func (t _tile) PaletteIndex() int {
-	// 1111 0000 0000 0000
-	return int(t & 61440 >> 12)
-}
-
-// Draws the tile to an image, given a tileset and an offset.
-func (t _tile) DrawTo(ts *_tileset, img *image.NRGBA, ox, oy int) {
-	s := ts.Sprite(t.SpriteIndex())
-	p := ts.Palette(t.PaletteIndex())
-	for i := 0; i < 64; i++ {
-		x, y := i%8, i/8
-		if t.FlipX() {
-			x = 7 - x
-		}
-		if t.FlipY() {
-			y = 7 - y
-		}
-		ci := s.ColorIndex(i)
-		pc := p.Color(ci)
-		var c color.NRGBA
-		if ci == 0 {
-			c = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
-		} else {
-			c = color.NRGBA{R: pc.R(), G: pc.G(), B: pc.B(), A: 255}
-		}
-		img.SetNRGBA(ox+x, oy+y, c)
-	}
+func (b _block) Tile(index, layer int) pkm.Tile {
+	return pkm.Tile(decUint16(b[index*2+8*layer:]))
 }
 
 // A sprite is an 8x8 array of pixel data. Each value in the sprite is an
@@ -476,8 +441,9 @@ func (s _sprite) Len() int {
 // A palette contains 16 colors.
 type _palette []byte
 
-func (p _palette) Color(i int) _color {
-	return _color(decUint16(p[i*2 : i*2+2]))
+func (p _palette) Color(i int) color.NRGBA {
+	c := _color(decUint16(p[i*2 : i*2+2]))
+	return color.NRGBA{R: c.R(), G: c.G(), B: c.B(), A: 255}
 }
 
 // 15-bit color, with each channel occupying 5 bits, or 32 values per channel.
