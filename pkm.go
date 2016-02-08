@@ -765,7 +765,7 @@ type Sprite interface {
 
 // A palette contains 16 colors.
 type Palette interface {
-	Color(i int) Color
+	Color(i int) color.NRGBA
 }
 
 // Create an image from a tileset and layout.
