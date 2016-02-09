@@ -703,6 +703,7 @@ type Layout interface {
 // Tileset comprises a list of blocks, as well as an image and palette list.
 // The full set is created from a global and local tileset.
 type Tileset interface {
+	ID() [2]uint32
 	Block(i int) Block
 	Sprite(i int) Sprite
 	Palette(i int) Palette

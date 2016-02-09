@@ -228,7 +228,7 @@ func (m Map) Tileset() pkm.Tileset {
 		4, 5,
 	)
 
-	ts := &_tileset{}
+	ts := &_tileset{id: [2]uint32{binary.LittleEndian.Uint32(b[0:4]), binary.LittleEndian.Uint32(b[4:8])}}
 	m.readTileset(ts, decPtr(b[0:4]), 0)
 	m.readTileset(ts, decPtr(b[4:8]), 1)
 	return ts
@@ -367,9 +367,14 @@ func (m Map) readTileset(ts *_tileset, p ptr, off int) {
 // Tileset comprises a list of blocks, as well as an image and palette list.
 // The full set is created from a global and local tileset.
 type _tileset struct {
+	id     [2]uint32
 	blocks [16384]byte
 	image  [32768]byte
 	pal    [512]byte
+}
+
+func (t _tileset) ID() [2]uint32 {
+	return t.id
 }
 
 func (t _tileset) Block(i int) pkm.Block {
