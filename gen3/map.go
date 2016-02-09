@@ -482,6 +482,43 @@ func (c _color) B() byte {
 
 ////////////////////////////////////////////////////////////////
 
+func (m Map) Connections() []pkm.Connection {
+	b := readStruct(
+		m.v.ROM,
+		m.headerPtr(),
+		0,
+		structMapHeader,
+		3,
+	)
+	b = readStruct(
+		m.v.ROM,
+		decPtr(b),
+		0,
+		structConnHeader,
+	)
+	n := int(decUint32(b[0:4]))
+	conns := make([]pkm.Connection, n)
+
+	m.v.ROM.Seek(decPtr(b[4:8]).ROM(), 0)
+	for i := range conns {
+		b = readStruct(
+			m.v.ROM,
+			m.headerPtr(),
+			i,
+			structConnData,
+		)
+		conns[i] = pkm.Connection{
+			Direction: pkm.Direction(decUint32(b[0:4])),
+			Offset:    int(decUint32(b[4:8])),
+			Bank:      int(b[8]),
+			Map:       int(b[9]),
+		}
+	}
+	return conns
+}
+
+////////////////////////////////////////////////////////////////
+
 func (m Map) Encounters() []pkm.EncounterList {
 	ptrs := [4]ptr{}
 	for p := 0; p < len(ptrs); p++ {

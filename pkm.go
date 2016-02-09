@@ -685,6 +685,8 @@ type Map interface {
 	// Returns the color that is drawn when no opaque colors have been drawn
 	// to a pixel.
 	BackgroundColor() color.NRGBA
+	// Returns a list of connected maps.
+	Connections() []Connection
 	// Returns a list of all the areas in the map which may contain
 	// encounters.
 	Encounters() []EncounterList
@@ -806,6 +808,46 @@ func CombineLayers(layers ...*image.NRGBA) *image.NRGBA {
 		)
 	}
 	return final
+}
+
+////////////////////////////////////////////////////////////////
+
+type Connection struct {
+	Direction Direction
+	Offset    int
+	Bank, Map int
+}
+
+type Direction byte
+
+const (
+	NoDir  Direction = 0
+	Down             = 1
+	Up               = 2
+	Left             = 3
+	Right            = 4
+	Dive             = 5
+	Emerge           = 6
+)
+
+func (d Direction) String() string {
+	switch d {
+	case NoDir:
+		return "None"
+	case Down:
+		return "Down"
+	case Up:
+		return "Up"
+	case Left:
+		return "Left"
+	case Right:
+		return "Right"
+	case Dive:
+		return "Dive"
+	case Emerge:
+		return "Emerge"
+	}
+	return "Unknown"
 }
 
 ////////////////////////////////////////////////////////////////
